@@ -5859,8 +5859,8 @@ Citizen.CreateThread(
 							end
 					end
 				elseif LynxEvo.Button("~h~Get Driving License") then
-					TriggerServerEvent("esx_dmvschool:addLicense", dmv)
-					TriggerServerEvent("esx_dmvschool:addLicense", drive)
+					TriggerServerEvent("esx_dmvschool:addLicense", 'dmv')
+					TriggerServerEvent("esx_dmvschool:addLicense", 'drive')
 				elseif LynxEvo.Button("~h~~b~Buy ~s~a vehicle for ~g~free") then
 					matacumparamasini()
 				end
