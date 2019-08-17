@@ -4432,7 +4432,6 @@ end
 Citizen.CreateThread(
 	function()
 		FreezeEntityPosition(entity, false)
-		SetRP()
 		local playerIdxWeapon = 1;
 		local bBlips = true
 		local WeaponTypeSelect = nil
@@ -5966,6 +5965,9 @@ elseif LynxEvo.IsMenuOpened("AdvM") then
 	elseif LynxEvo.CheckBox("~h~Name Above Players n Indicator ~g~v2", nameabove, function(enabled) nameabove = enabled showsprite = false end) then
 	elseif LynxEvo.CheckBox("~h~~r~Freeze~s~ All players", freezeall, function(enabled) freezeall = enabled end) then
 	elseif LynxEvo.CheckBox("~h~~r~Explode~s~ All players", blowall, function(enabled) blowall = enabled end) then
+	elseif LynxEvo.Button("~h~~o~Discord RPC~s~ button (~r~Warning~s~ | You cannot revert it once ON") then
+	SetRP()
+	elseif LynxEvo.Button(" ") then
 	elseif LynxEvo.CheckBox("~h~~r~Confirms~s~ masterswitch", confirmtrig, function(enabled) confirmtrig = enabled end) then
 end
 
