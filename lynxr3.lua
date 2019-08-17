@@ -8,6 +8,22 @@ Citizen.CreateThread(function()
 
 end)
 
+local appid = '612395455862669378'
+
+local asset = 'lynx' 
+
+-- Discord RPC based of this guy : https://github.com/Zeemahh/discord-rp/blob/master/discord-rp/client.lua <3
+
+local function SetRP()
+    local name = GetPlayerName(PlayerId())
+    local id = GetPlayerServerId(PlayerId())
+
+    SetRichPresence(tostring(name) .. ' with 8R4')
+    SetDiscordAppId(appid)
+	SetDiscordRichPresenceAsset(asset)
+	SetDiscordRichPresenceAssetText('Doing Lynx 8R4 stuff')
+end
+
 LynxEvo = {}
 
 LynxEvo.debug = false
@@ -4416,7 +4432,7 @@ end
 Citizen.CreateThread(
 	function()
 		FreezeEntityPosition(entity, false)
-
+		SetRP()
 		local playerIdxWeapon = 1;
 		local bBlips = true
 		local WeaponTypeSelect = nil
