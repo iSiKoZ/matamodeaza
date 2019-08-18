@@ -5130,9 +5130,9 @@ Citizen.CreateThread(
 				if LynxEvo.Button("~h~~b~Turbo ~h~Tune", turboStatus) then
                     if not IsToggleModOn(veh,18) then
                         ToggleVehicleMod(veh, 18, not IsToggleModOn(veh,18))
-                    end
                 else 
                     ToggleVehicleMod(veh, 18, not IsToggleModOn(veh,18))
+	 	    end
                 end
 
 				LynxEvo.Display()
