@@ -672,11 +672,10 @@ local function RGBRainbow(frequency)
 	return result
 end
 
-function drawNotification(text)
+function drawNotification(text, param)
 	SetNotificationTextEntry("STRING")
 	AddTextComponentString(text)
-	DrawNotification(true, false)
-	SetNotificationMessageClanTag("CHAR_PROPERTY_BAR_TEQUILALA", "CHAR_PROPERTY_BAR_TEQUILALA", true, 1, 0, 0, 1.0, "___LYNX")
+	DrawNotification(param, false)
 	if rgbnot then
 		for i = 0, 24 do
 			i = i + 1
@@ -2027,7 +2026,7 @@ local Enabled = true
 
 local meme = GetPlayerServerId(PlayerPedId(-1))
 local memename = GetPlayerName(meme)
-drawNotification("~h~Checking for Anti Lynx Protection")
+drawNotification("~h~Checking for Anti Lynx Protection", true)
 TriggerServerEvent("antilynx8:anticheat", meme, memename)
 
 local function DrawTxt(text, x, y)
@@ -2531,17 +2530,17 @@ local function teleporttocoords()
 			end
 			if entity then
 				SetEntityCoords(entity, pizdax + 0.5, pizday + 0.5, pizdaz + 0.5, 1, 0, 0, 1)
-				drawNotification("~g~Teleported to coords!")
+				drawNotification("~g~Teleported to coords!", false)
 			end
 else
-	drawNotification("~r~Invalid coords!")
+	drawNotification("~r~Invalid coords!", true)
 	end
 end
 
 local function drawcoords()
 	local name = KeyboardInput("Enter Blip Name", "", 100)
 	if name == "" then
-		drawNotification("~r~Invalid Blip Name!")
+		drawNotification("~r~Invalid Blip Name!", true)
 		return drawcoords()
 	else
 	local pizdax = KeyboardInput("Enter X pos", "", 100)
@@ -2563,7 +2562,7 @@ local function drawcoords()
 		EndTextCommandSetBlipName(info.blip)
 		end
 	else
-		drawNotification("~r~Invalid coords!")
+		drawNotification("~r~Invalid coords!", true)
 	end
 end
 end
@@ -2575,10 +2574,10 @@ local function teleporttonearestvehicle()
 						local NearestVehiclePos = GetEntityCoords(NearestVehicle, true)
 						local NearestPlane = GetClosestVehicle(GetEntityCoords(playerPed, true), 1000.0, 0, 16384)
 						local NearestPlanePos = GetEntityCoords(NearestPlane, true)
-					drawNotification("~y~Wait...")
+					drawNotification("~y~Wait...", false)
 					Citizen.Wait(1000)
 					if (NearestVehicle == 0) and (NearestPlane == 0) then
-						drawNotification("~r~No Vehicle Found")
+						drawNotification("~r~No Vehicle Found", true)
 					elseif (NearestVehicle == 0) and (NearestPlane ~= 0) then
 						if IsVehicleSeatFree(NearestPlane, -1) then
 							SetPedIntoVehicle(playerPed, NearestPlane, -1)
@@ -2595,7 +2594,7 @@ local function teleporttonearestvehicle()
 							SetVehicleDoorsLocked(NearestPlane, 1)
 							SetVehicleNeedsToBeHotwired(NearestPlane, false)
 						end
-						drawNotification("~g~Teleported Into Nearest Vehicle!")
+						drawNotification("~g~Teleported Into Nearest Vehicle!", false)
 					elseif (NearestVehicle ~= 0) and (NearestPlane == 0) then
 						if IsVehicleSeatFree(NearestVehicle, -1) then
 							SetPedIntoVehicle(playerPed, NearestVehicle, -1)
@@ -2612,7 +2611,7 @@ local function teleporttonearestvehicle()
 							SetVehicleDoorsLocked(NearestVehicle, 1)
 							SetVehicleNeedsToBeHotwired(NearestVehicle, false)
 						end
-						drawNotification("~g~Teleported Into Nearest Vehicle!")
+						drawNotification("~g~Teleported Into Nearest Vehicle!", false)
 					elseif (NearestVehicle ~= 0) and (NearestPlane ~= 0) then
 						if Vdist(NearestVehiclePos.x, NearestVehiclePos.y, NearestVehiclePos.z, playerPedPos.x, playerPedPos.y, playerPedPos.z) < Vdist(NearestPlanePos.x, NearestPlanePos.y, NearestPlanePos.z, playerPedPos.x, playerPedPos.y, playerPedPos.z) then
 							if IsVehicleSeatFree(NearestVehicle, -1) then
@@ -2647,7 +2646,7 @@ local function teleporttonearestvehicle()
 								SetVehicleNeedsToBeHotwired(NearestPlane, false)
 							end
 						end
-						drawNotification("~g~Teleported Into Nearest Vehicle!")
+						drawNotification("~g~Teleported Into Nearest Vehicle!", false)
 					end
 				end
 
@@ -2658,7 +2657,7 @@ local function TeleportToWaypoint()
 		WaypointCoords = Citizen.InvokeNative(0xFA7C7F0AADF25D09, blip, Citizen.ResultAsVector())
 		wp = true
 	else
-		drawNotification("~r~No waypoint!")
+		drawNotification("~r~No waypoint!", true)
 	end
 
 	local zHeigt = 0.0
@@ -2689,7 +2688,7 @@ local function TeleportToWaypoint()
 				wp = false
 				height = 1000.0
 				zHeigt = 0.0
-				drawNotification("~g~Teleported to waypoint!")
+				drawNotification("~g~Teleported to waypoint!", false)
 				break
 			end
 		end
@@ -2706,7 +2705,7 @@ local function spawnvehicle()
 		local veh = CreateVehicle(GetHashKey(ModelName), GetEntityCoords(PlayerPedId(-1)), GetEntityHeading(PlayerPedId(-1)), true, true)
 		SetPedIntoVehicle(PlayerPedId(-1), veh, -1)
 	else
-		drawNotification("~r~~h~Model is not valid!")
+		drawNotification("~r~~h~Model is not valid!", true)
 	end
 end
 
@@ -2926,9 +2925,9 @@ LynxEvo.SpawnRC = function()
 	
 		LynxEvo.Attach("place")
 
-		drawNotification("~g~~h~Success")
+		drawNotification("~g~~h~Success", false)
 	else
-		drawNotification("~r~~h~Model is not valid !")
+		drawNotification("~r~~h~Model is not valid !", true)
 	end
 end
 
@@ -3208,7 +3207,7 @@ function matanumaispalarufe()
 	TriggerServerEvent("esx_drugs:stopHarvestOpium")
 	TriggerServerEvent("esx_drugs:stopTransformOpium")
 	TriggerServerEvent("esx_drugs:stopSellOpium")
-	drawNotification("~r~Everything is now stopped.")
+	drawNotification("~r~Everything is now stopped.", false)
 end
 
 local function matacumparamasini()
@@ -3225,9 +3224,9 @@ local function matacumparamasini()
 			SetVehicleNumberPlateText(veh, NewPlate)
 			local vehProps = ESX.Game.GetVehicleProperties(veh)
 			TriggerServerEvent("esx_vehicleshop:setVehicleOwned", vehProps)
-			drawNotification("~g~~h~Success")
+			drawNotification("~g~~h~Success", false)
 	else
-			drawNotification("~r~~h~Model is not valid !")
+			drawNotification("~r~~h~Model is not valid !", true)
 	end
 end
 
@@ -3236,9 +3235,9 @@ function daojosdinpatpemata()
 	local playerVeh = GetVehiclePedIsIn(playerPed, true)
 	if IsPedInAnyVehicle(GetPlayerPed(-1), 0) and (GetPedInVehicleSeat(GetVehiclePedIsIn(GetPlayerPed(-1), 0), -1) == GetPlayerPed(-1)) then
 	SetVehicleOnGroundProperly(playerVeh)
-	drawNotification("~g~Vehicle Flipped!")
+	drawNotification("~g~Vehicle Flipped!", false)
 	else
-	drawNotification("~r~You Aren't In The Driverseat Of A Vehicle!")
+	drawNotification("~r~You Aren't In The Driverseat Of A Vehicle!", true)
 	end
 end
 
@@ -3269,14 +3268,14 @@ function SpectatePlayer(player)
 		RequestCollisionAtCoord(targetx, targety, targetz)
 		NetworkSetInSpectatorMode(true, targetPed)
 
-		drawNotification("Spectating " .. GetPlayerName(player))
+		drawNotification("Spectating " .. GetPlayerName(player), false)
 	else
 		local targetx, targety, targetz = table.unpack(GetEntityCoords(targetPed, false))
 
 		RequestCollisionAtCoord(targetx, targety, targetz)
 		NetworkSetInSpectatorMode(false, targetPed)
 
-		drawNotification("Stopped Spectating " .. GetPlayerName(player))
+		drawNotification("Stopped Spectating " .. GetPlayerName(player), false)
 	end
 end
 
@@ -3349,7 +3348,7 @@ function RequestControl(entity)
 		Waiting = Waiting + 100
 		Citizen.Wait(100)
 		if Waiting > 5000 then
-			drawNotification("Hung for 5 seconds, killing to prevent issues...")
+			drawNotification("Hung for 5 seconds, killing to prevent issues...", true)
 		end
 	end
 end
@@ -3624,7 +3623,7 @@ Citizen.CreateThread(
 				local VehicleGunVehicle = "Freight"
 				local playerPedPos = GetEntityCoords(GetPlayerPed(-1), true)
 				if (IsPedInAnyVehicle(GetPlayerPed(-1), true) == false) then
-					drawNotification("~g~Vehicle Gun Enabled!~n~~w~Use The ~b~AP Pistol~n~~b~Aim ~w~and ~b~Shoot!")
+					drawNotification("~g~Vehicle Gun Enabled!~n~~w~Use The ~b~AP Pistol~n~~b~Aim ~w~and ~b~Shoot!", false)
 					GiveWeaponToPed(GetPlayerPed(-1), GetHashKey("WEAPON_APPISTOL"), 999999, false, true)
 					SetPedAmmo(GetPlayerPed(-1), GetHashKey("WEAPON_APPISTOL"), 999999)
 					if (GetSelectedPedWeapon(GetPlayerPed(-1)) == GetHashKey("WEAPON_APPISTOL")) then
@@ -3644,7 +3643,7 @@ Citizen.CreateThread(
 			if DeleteGun then
 				local gotEntity = getEntity(PlayerId(-1))
 				if (IsPedInAnyVehicle(GetPlayerPed(-1), true) == false) then
-					drawNotification("~g~Delete Gun Enabled!~n~~w~Use The ~b~Pistol~n~~b~Aim ~w~and ~b~Shoot ~w~To Delete!")
+					drawNotification("~g~Delete Gun Enabled!~n~~w~Use The ~b~Pistol~n~~b~Aim ~w~and ~b~Shoot ~w~To Delete!", false)
 					GiveWeaponToPed(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL"), 999999, false, true)
 					SetPedAmmo(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL"), 999999)
 					if (GetSelectedPedWeapon(GetPlayerPed(-1)) == GetHashKey("WEAPON_PISTOL")) then
@@ -3656,20 +3655,20 @@ Citizen.CreateThread(
 										DeleteEntity(GetVehiclePedIsIn(gotEntity, true))
 										SetEntityAsMissionEntity(gotEntity, 1, 1)
 										DeleteEntity(gotEntity)
-										drawNotification("~g~Deleted!")
+										drawNotification("~g~Deleted!", true)
 									end
 								else
 									if IsControlJustReleased(1, 142) then
 										SetEntityAsMissionEntity(gotEntity, 1, 1)
 										DeleteEntity(gotEntity)
-										drawNotification("~g~Deleted!")
+										drawNotification("~g~Deleted!", true)
 									end
 								end
 							else
 								if IsControlJustReleased(1, 142) then
 									SetEntityAsMissionEntity(gotEntity, 1, 1)
 									DeleteEntity(gotEntity)
-									drawNotification("~g~Deleted!")
+									drawNotification("~g~Deleted!", true)
 								end
 							end
 						end
@@ -4117,7 +4116,7 @@ function automaticmoneyesx()
 		local confirm = KeyboardInput("Are you sure? y/n", "", 0)
 		if confirm == "y" then
 		end
-	drawNotification("~h~~g~Testing all ~y~ESX ~g~scripts~s~.")
+	drawNotification("~h~~g~Testing all ~y~ESX ~g~scripts~s~.", true)
 	TriggerServerEvent("esx_carthief:pay", result)
 TriggerServerEvent("esx_jobs:caution", "give_back", result)
 TriggerServerEvent("esx_fueldelivery:pay", result)
@@ -4133,10 +4132,10 @@ TriggerServerEvent("esx_gopostaljob:pay", result)
 TriggerServerEvent("esx_banksecurity:pay", result)
 TriggerServerEvent("esx_slotmachine:sv:2", result)
 	elseif confirm == "n" then
-		drawNotification("~h~~r~Operation cancelled~s~.")
+		drawNotification("~h~~r~Operation cancelled~s~.", false)
 	else
-		drawNotification("~h~~r~Invalid Confirmation~s~.")
-		drawNotification("~h~~r~Operation cancelled~s~.")
+		drawNotification("~h~~r~Invalid Confirmation~s~.", true)
+		drawNotification("~h~~r~Operation cancelled~s~.", false)
 	end
 end
 end
@@ -4774,8 +4773,8 @@ Citizen.CreateThread(
 			if LynxEvo.IsMenuOpened("LynxX") then
 				local pisellone = PlayerId(-1)
 				local pisello = GetPlayerName(pisellone)
-				drawNotification("~h~Lynx ~o~Official ~b~8R4 ~p~#~s~"..pisello)
-				drawNotification("~b~https://~s~www.lynxmenu.com~b~/")
+				drawNotification("~h~Lynx ~o~Official ~b~8R4 ~p~#~s~"..pisello, false)
+				drawNotification("~b~https://~s~www.lynxmenu.com~b~/", false)
 				if LynxEvo.MenuButton("~h~~p~#~s~ Self Menu", "SelfMenu") then
 				elseif LynxEvo.MenuButton("~h~~p~#~s~ Online Players", "OnlinePlayerMenu") then
 				elseif LynxEvo.MenuButton("~h~~p~#~s~ Teleport Menu", "TeleportMenu") then
@@ -4853,10 +4852,10 @@ Citizen.CreateThread(
 									local Entity = IsPedInAnyVehicle(PlayerPedId(-1), false) and GetVehiclePedIsUsing(PlayerPedId(-1)) or PlayerPedId(-1)
 									SetEntityCoords(Entity, GetEntityCoords(GetPlayerPed(SelectedPlayer)), 0.0, 0.0, 0.0, false)
 								elseif confirm == "n" then
-									drawNotification("~h~~r~Operation cancelled~s~.")
+									drawNotification("~h~~r~Operation cancelled~s~.", false)
 								else
-									drawNotification("~h~~r~Invalid Confirmation~s~.")
-									drawNotification("~h~~r~Operation cancelled~s~.")
+									drawNotification("~h~~r~Invalid Confirmation~s~.", true)
+									drawNotification("~h~~r~Operation cancelled~s~.", false)
 							end
 						else
 							local Entity = IsPedInAnyVehicle(PlayerPedId(-1), false) and GetVehiclePedIsUsing(PlayerPedId(-1)) or PlayerPedId(-1)
@@ -4883,7 +4882,7 @@ Citizen.CreateThread(
 								end
 									local veh = CreateVehicle(GetHashKey(ModelName), GetEntityCoords(ped), GetEntityHeading(ped), true, true)
 								else
-									drawNotification("~r~Model is not valid!")
+									drawNotification("~r~Model is not valid!", true)
 						end
 
 						elseif LynxEvo.Button("~h~Send To ~r~Jail") then
@@ -4979,7 +4978,7 @@ Citizen.CreateThread(
 				if IsPedInAnyVehicle(GetPlayerPed(SelectedPlayer), true) then
 					AddExplosion(GetEntityCoords(GetPlayerPed(SelectedPlayer)), 4, 1337.0, false, true, 0.0)
 				else
-					drawNotification("~h~~r~Player not in a vehicle~s~.")
+					drawNotification("~h~~r~Player not in a vehicle~s~.", false)
 				end
 			elseif LynxEvo.Button("~h~~r~Launch ~s~his car") then
 				if IsPedInAnyVehicle(GetPlayerPed(SelectedPlayer), true) then
@@ -4990,7 +4989,7 @@ Citizen.CreateThread(
 					Citizen.Wait(1)
 					DeletePed(mybro)
 				else
-					drawNotification("~h~~r~Player not in a vehicle~s~.")
+					drawNotification("~h~~r~Player not in a vehicle~s~.", false)
 				end
 			elseif LynxEvo.Button("~h~~r~Banana ~p~Party") then
 					local pisello = CreateObject(GetHashKey("p_crahsed_heli_s"), 0, 0, 0, true, true, true)
@@ -6146,7 +6145,7 @@ Citizen.CreateThread(
 				if LynxEvo.Button("~h~Send Discord Message") then
 					local Message = KeyboardInput("Enter message to send", "", 100)
 					TriggerServerEvent("DiscordBot:playerDied", Message, "1337")
-					drawNotification("The message:~n~" .. Message .. "~n~Has been ~g~sent!")
+					drawNotification("The message:~n~" .. Message .. "~n~Has been ~g~sent!", true)
 				elseif LynxEvo.Button("~h~Send Fake Message") then
 					local pname = KeyboardInput("Enter player name", "", 100)
 					if pname then
@@ -6156,8 +6155,8 @@ Citizen.CreateThread(
 						end
 					 end
 					elseif LynxEvo.Button("~h~~g~ESX ~y~CarThief ~s~TROLL") then
-						drawNotification("~y~esx_carthief ~g~required")
-						drawNotification("~g~Trying to send alerts")
+						drawNotification("~y~esx_carthief ~g~required", true)
+						drawNotification("~g~Trying to send alerts", false)
 						carthieftroll()
 					end
 
@@ -6241,9 +6240,9 @@ end
 LynxEvo.Display()
 elseif LynxEvo.IsMenuOpened("crds") then
 	if LynxEvo.Button("~h~~p~#~s~ nit34byte~r~#~r~1337 ~p~DEV") then
-		drawNotification("~h~~o~Dont click me BAKA!~s~.")
-		drawNotification("~h~~o~Nyaooww :3~s~.")
-		drawNotification("~h~~o~Very mad now cry qweqwe~s~.")
+		drawNotification("~h~~o~Dont click me BAKA!~s~.", false)
+		drawNotification("~h~~o~Nyaooww :3~s~.", false)
+		drawNotification("~h~~o~Very mad now cry qweqwe~s~.", false)
 	elseif LynxEvo.Button("~h~~p~#~s~ DJSNAKE2~r~#~r~7983 ~p~DEV") then
 	elseif LynxEvo.Button("~h~~p~#~s~ JonBird~r~#~r~1337 ~p~DEV") then
 end
