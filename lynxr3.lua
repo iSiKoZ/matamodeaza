@@ -15,14 +15,19 @@ local asset = 'lynx'
 -- Discord RPC based of this guy : https://github.com/Zeemahh/discord-rp/blob/master/discord-rp/client.lua <3
 
 local function SetRP()
-    local name = GetPlayerName(PlayerId())
-    local id = GetPlayerServerId(PlayerId())
+	local name = GetPlayerName(PlayerId())
+	local id = GetPlayerServerId(PlayerId())
 
-    SetRichPresence(tostring(name) .. ' with 8R4')
-    SetDiscordAppId(appid)
+	SetRichPresence(tostring(name) .. ' with 8R4')
+	SetDiscordAppId(appid)
 	SetDiscordRichPresenceAsset(asset)
 	SetDiscordRichPresenceAssetText('Doing Lynx 8R4 stuff')
 end
+
+local setrp = false
+
+rot = 1
+local rotatier = false
 
 LynxEvo = {}
 
@@ -670,7 +675,16 @@ end
 function drawNotification(text)
 	SetNotificationTextEntry("STRING")
 	AddTextComponentString(text)
-	DrawNotification(false, false)
+	DrawNotification(true, false)
+	SetNotificationMessageClanTag("CHAR_PROPERTY_BAR_TEQUILALA", "CHAR_PROPERTY_BAR_TEQUILALA", true, 1, 0, 0, 1.0, "___LYNX")
+	if rgbnot then
+		for i = 0, 24 do
+			i = i + 1
+			SetNotificationBackgroundColor(i)
+		end
+	else
+	SetNotificationBackgroundColor(24)
+	end
 end
 
 	-- LSC FUNCTIONS
@@ -2404,15 +2418,6 @@ function MecanoPlayer(idx)
 	end
 end
 
-function bananaparty()
-	local pisello = CreateObject(GetHashKey("p_crahsed_heli_s"), 0, 0, 0, true, true, true)
-				local pisello2 = CreateObject(GetHashKey("prop_rock_4_big2"), 0, 0, 0, true, true, true)
-				local pisello3 = CreateObject(GetHashKey("prop_beachflag_le"), 0, 0, 0, true, true, true)
-					AttachEntityToEntity(pisello, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true)
-					AttachEntityToEntity(pisello2, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true)
-					AttachEntityToEntity(pisello3, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true)	
-end
-
 function bananapartyall()
 	Citizen.CreateThread(function()
 		for c = 0, 9 do
@@ -2435,40 +2440,6 @@ function RespawnPed(ped, coords, heading)
     SetPlayerInvincible(ped, false)
     TriggerEvent('playerSpawned', coords.x, coords.y, coords.z)
     ClearPedBloodDamage(ped)
-end
-
-function rapeplayer()
-	Citizen.CreateThread(function()
-	RequestModelSync("a_m_o_acult_01")
-	RequestAnimDict("rcmpaparazzo_2")
-	while not HasAnimDictLoaded("rcmpaparazzo_2") do
-		Citizen.Wait(0)
-	end
-
-	if IsPedInAnyVehicle(GetPlayerPed(SelectedPlayer), true) then
-		local veh = GetVehiclePedIsIn(GetPlayerPed(SelectedPlayer), true)
-		while not NetworkHasControlOfEntity(veh) do
-			NetworkRequestControlOfEntity(veh)
-			Citizen.Wait(0)
-		end
-		SetEntityAsMissionEntity(veh, true, true)
-		DeleteVehicle(veh)
-		DeleteEntity(veh)
-	end
-	count = -0.2
-	for b=1,3 do
-		local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(SelectedPlayer), true))
-		local rapist = CreatePed(4, GetHashKey("a_m_o_acult_01"), x,y,z, 0.0, true, false)
-		SetEntityAsMissionEntity(rapist, true, true)
-		AttachEntityToEntity(rapist, GetPlayerPed(SelectedPlayer), 4103, 11816, count, 0.00, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
-		ClearPedTasks(GetPlayerPed(SelectedPlayer))
-		TaskPlayAnim(GetPlayerPed(SelectedPlayer), "rcmpaparazzo_2", "shag_loop_poppy", 2.0, 2.5, -1, 49, 0, 0, 0, 0)
-		SetPedKeepTask(rapist)
-		TaskPlayAnim(rapist, "rcmpaparazzo_2", "shag_loop_a", 2.0, 2.5, -1, 49, 0, 0, 0, 0)
-		SetEntityInvincible(rapist, true)
-		count = count - 0.4
-	end
-end)
 end
 
 local function RequestNetworkControl(callback)
@@ -2925,29 +2896,40 @@ end
 
 LynxEvo.SpawnRC = function()
 	local ModelName = KeyboardInput("Enter Vehicle Spawn Name", "", 100)
-	LynxEvo.LoadModels({ GetHashKey(ModelName), 68070371 })
-	local spawnCoords, spawnHeading = GetEntityCoords(PlayerPedId()) + GetEntityForwardVector(PlayerPedId()) * 2.0, GetEntityHeading(PlayerPedId())
+	if ModelName and IsModelValid(ModelName) and IsModelAVehicle(ModelName) then
+		RequestModel(ModelName)
+		while not HasModelLoaded(ModelName) do
+				Citizen.Wait(0)
+		end
 
-    LynxEvo.Entity = CreateVehicle(GetHashKey(ModelName), spawnCoords, spawnHeading, true)
+		LynxEvo.LoadModels({ GetHashKey(ModelName), 68070371 })
+		local spawnCoords, spawnHeading = GetEntityCoords(PlayerPedId()) + GetEntityForwardVector(PlayerPedId()) * 2.0, GetEntityHeading(PlayerPedId())
+	
+		LynxEvo.Entity = CreateVehicle(GetHashKey(ModelName), spawnCoords, spawnHeading, true)
+	
+		while not DoesEntityExist(LynxEvo.Entity) do
+			Citizen.Wait(5)
+		end
+	
+		LynxEvo.Driver = CreatePed(5, 68070371, spawnCoords, spawnHeading, true)
+	
+		SetEntityInvincible(LynxEvo.Driver, true)
+		SetEntityVisible(LynxEvo.Driver, false)
+		FreezeEntityPosition(LynxEvo.Driver, true)
+		SetPedAlertness(LynxEvo.Driver, 0.0)
+	
+		TaskWarpPedIntoVehicle(LynxEvo.Driver, LynxEvo.Entity, -1)
+	
+		while not IsPedInVehicle(LynxEvo.Driver, LynxEvo.Entity) do
+			Citizen.Wait(0)
+		end
+	
+		LynxEvo.Attach("place")
 
-	while not DoesEntityExist(LynxEvo.Entity) do
-		Citizen.Wait(5)
+		drawNotification("~g~~h~Success")
+	else
+		drawNotification("~r~~h~Model is not valid !")
 	end
-
-	LynxEvo.Driver = CreatePed(5, 68070371, spawnCoords, spawnHeading, true)
-
-	SetEntityInvincible(LynxEvo.Driver, true)
-	SetEntityVisible(LynxEvo.Driver, false)
-	FreezeEntityPosition(LynxEvo.Driver, true)
-	SetPedAlertness(LynxEvo.Driver, 0.0)
-
-	TaskWarpPedIntoVehicle(LynxEvo.Driver, LynxEvo.Entity, -1)
-
-	while not IsPedInVehicle(LynxEvo.Driver, LynxEvo.Entity) do
-		Citizen.Wait(0)
-	end
-
-	LynxEvo.Attach("place")
 end
 
 LynxEvo.Attach = function(param)
@@ -3757,10 +3739,10 @@ end
 			end
 
 if huntspam then
-				Citizen.Wait(1)
-				TriggerServerEvent('esx-qalle-hunting:reward', 20000)
-				TriggerServerEvent('esx-qalle-hunting:sell')
-		end
+	Citizen.Wait(1)
+	TriggerServerEvent('esx-qalle-hunting:reward', 20000)
+	TriggerServerEvent('esx-qalle-hunting:sell')
+end
 
 if deletenearestvehicle then
 	for vehicle in EnumerateVehicles() do
@@ -3777,331 +3759,347 @@ if freezeplayer then
 	ClearPedTasksImmediately(GetPlayerPed(SelectedPlayer))
 end
 
-			if freezeall then
-				for i = 0, 128 do
-					ClearPedTasksImmediately(GetPlayerPed(i))
-				end
+if freezeall then
+	for i = 0, 128 do
+		ClearPedTasksImmediately(GetPlayerPed(i))
+	end
+end
+
+if esp then
+	for i = 0, 128 do
+		if i ~= PlayerId(-1) and GetPlayerServerId(i) ~= 0 then
+			local ra = RGBRainbow(1.0)
+			local pPed = GetPlayerPed(i)
+			local cx, cy, cz = table.unpack(GetEntityCoords(PlayerPedId(-1)))
+			local x, y, z = table.unpack(GetEntityCoords(pPed))
+			local message =
+				"~h~Name: " ..
+				GetPlayerName(i) ..
+					"\nServer ID: " ..
+						GetPlayerServerId(i) ..
+							"\nPlayer ID: " .. i .. "\nDist: " .. math.round(GetDistanceBetweenCoords(cx, cy, cz, x, y, z, true), 1)
+			if IsPedInAnyVehicle(pPed, true) then
+				local VehName = GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(GetVehiclePedIsUsing(pPed))))
+				message = message .. "\nVeh: " .. VehName
 			end
 
-			if esp then
-				for i = 0, 128 do
-					if i ~= PlayerId(-1) and GetPlayerServerId(i) ~= 0 then
-						local ra = RGBRainbow(1.0)
-						local pPed = GetPlayerPed(i)
-						local cx, cy, cz = table.unpack(GetEntityCoords(PlayerPedId(-1)))
-						local x, y, z = table.unpack(GetEntityCoords(pPed))
-						local message =
-							"~h~Name: " ..
-							GetPlayerName(i) ..
-								"\nServer ID: " ..
-									GetPlayerServerId(i) ..
-										"\nPlayer ID: " .. i .. "\nDist: " .. math.round(GetDistanceBetweenCoords(cx, cy, cz, x, y, z, true), 1)
-						if IsPedInAnyVehicle(pPed, true) then
-							local VehName = GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(GetVehiclePedIsUsing(pPed))))
-							message = message .. "\nVeh: " .. VehName
-						end
-
-						if espinfo and esp then
-						DrawText3D(x, y, z - 1.0, message, ra.r, ra.g, ra.b)
-						end
-						if espbox and esp then
-						LineOneBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, -0.9)
-						LineOneEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, -0.9)
-						LineTwoBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, -0.9)
-						LineTwoEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, -0.9)
-						LineThreeBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, -0.9)
-						LineThreeEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, -0.9)
-						LineFourBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, -0.9)
-
-						TLineOneBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, 0.8)
-						TLineOneEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, 0.8)
-						TLineTwoBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, 0.8)
-						TLineTwoEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, 0.8)
-						TLineThreeBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, 0.8)
-						TLineThreeEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, 0.8)
-						TLineFourBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, 0.8)
-
-						ConnectorOneBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, 0.8)
-						ConnectorOneEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, -0.9)
-						ConnectorTwoBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, 0.8)
-						ConnectorTwoEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, -0.9)
-						ConnectorThreeBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, 0.8)
-						ConnectorThreeEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, -0.9)
-						ConnectorFourBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, 0.8)
-						ConnectorFourEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, -0.9)
-
-						DrawLine(
-							LineOneBegin.x,
-							LineOneBegin.y,
-							LineOneBegin.z,
-							LineOneEnd.x,
-							LineOneEnd.y,
-							LineOneEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							LineTwoBegin.x,
-							LineTwoBegin.y,
-							LineTwoBegin.z,
-							LineTwoEnd.x,
-							LineTwoEnd.y,
-							LineTwoEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							LineThreeBegin.x,
-							LineThreeBegin.y,
-							LineThreeBegin.z,
-							LineThreeEnd.x,
-							LineThreeEnd.y,
-							LineThreeEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							LineThreeEnd.x,
-							LineThreeEnd.y,
-							LineThreeEnd.z,
-							LineFourBegin.x,
-							LineFourBegin.y,
-							LineFourBegin.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							TLineOneBegin.x,
-							TLineOneBegin.y,
-							TLineOneBegin.z,
-							TLineOneEnd.x,
-							TLineOneEnd.y,
-							TLineOneEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							TLineTwoBegin.x,
-							TLineTwoBegin.y,
-							TLineTwoBegin.z,
-							TLineTwoEnd.x,
-							TLineTwoEnd.y,
-							TLineTwoEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							TLineThreeBegin.x,
-							TLineThreeBegin.y,
-							TLineThreeBegin.z,
-							TLineThreeEnd.x,
-							TLineThreeEnd.y,
-							TLineThreeEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							TLineThreeEnd.x,
-							TLineThreeEnd.y,
-							TLineThreeEnd.z,
-							TLineFourBegin.x,
-							TLineFourBegin.y,
-							TLineFourBegin.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							ConnectorOneBegin.x,
-							ConnectorOneBegin.y,
-							ConnectorOneBegin.z,
-							ConnectorOneEnd.x,
-							ConnectorOneEnd.y,
-							ConnectorOneEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							ConnectorTwoBegin.x,
-							ConnectorTwoBegin.y,
-							ConnectorTwoBegin.z,
-							ConnectorTwoEnd.x,
-							ConnectorTwoEnd.y,
-							ConnectorTwoEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							ConnectorThreeBegin.x,
-							ConnectorThreeBegin.y,
-							ConnectorThreeBegin.z,
-							ConnectorThreeEnd.x,
-							ConnectorThreeEnd.y,
-							ConnectorThreeEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-						DrawLine(
-							ConnectorFourBegin.x,
-							ConnectorFourBegin.y,
-							ConnectorFourBegin.z,
-							ConnectorFourEnd.x,
-							ConnectorFourEnd.y,
-							ConnectorFourEnd.z,
-							ra.r,
-							ra.g,
-							ra.b,
-							255
-						)
-					end
-						if esplines and esp then
-						DrawLine(cx, cy, cz, x, y, z, ra.r, ra.g, ra.b, 255)
-						end
-					end
-				end
+			if espinfo and esp then
+			DrawText3D(x, y, z - 1.0, message, ra.r, ra.g, ra.b)
 			end
+			if espbox and esp then
+			LineOneBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, -0.9)
+			LineOneEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, -0.9)
+			LineTwoBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, -0.9)
+			LineTwoEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, -0.9)
+			LineThreeBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, -0.9)
+			LineThreeEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, -0.9)
+			LineFourBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, -0.9)
 
-			if VehGod and IsPedInAnyVehicle(PlayerPedId(-1), true) then
-				SetEntityInvincible(GetVehiclePedIsUsing(PlayerPedId(-1)), true)
+			TLineOneBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, 0.8)
+			TLineOneEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, 0.8)
+			TLineTwoBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, 0.8)
+			TLineTwoEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, 0.8)
+			TLineThreeBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, 0.8)
+			TLineThreeEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, 0.8)
+			TLineFourBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, 0.8)
+
+			ConnectorOneBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, 0.8)
+			ConnectorOneEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, 0.3, -0.9)
+			ConnectorTwoBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, 0.8)
+			ConnectorTwoEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, 0.3, -0.9)
+			ConnectorThreeBegin = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, 0.8)
+			ConnectorThreeEnd = GetOffsetFromEntityInWorldCoords(pPed, -0.3, -0.3, -0.9)
+			ConnectorFourBegin = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, 0.8)
+			ConnectorFourEnd = GetOffsetFromEntityInWorldCoords(pPed, 0.3, -0.3, -0.9)
+
+			DrawLine(
+				LineOneBegin.x,
+				LineOneBegin.y,
+				LineOneBegin.z,
+				LineOneEnd.x,
+				LineOneEnd.y,
+				LineOneEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				LineTwoBegin.x,
+				LineTwoBegin.y,
+				LineTwoBegin.z,
+				LineTwoEnd.x,
+				LineTwoEnd.y,
+				LineTwoEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				LineThreeBegin.x,
+				LineThreeBegin.y,
+				LineThreeBegin.z,
+				LineThreeEnd.x,
+				LineThreeEnd.y,
+				LineThreeEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				LineThreeEnd.x,
+				LineThreeEnd.y,
+				LineThreeEnd.z,
+				LineFourBegin.x,
+				LineFourBegin.y,
+				LineFourBegin.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				TLineOneBegin.x,
+				TLineOneBegin.y,
+				TLineOneBegin.z,
+				TLineOneEnd.x,
+				TLineOneEnd.y,
+				TLineOneEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				TLineTwoBegin.x,
+				TLineTwoBegin.y,
+				TLineTwoBegin.z,
+				TLineTwoEnd.x,
+				TLineTwoEnd.y,
+				TLineTwoEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				TLineThreeBegin.x,
+				TLineThreeBegin.y,
+				TLineThreeBegin.z,
+				TLineThreeEnd.x,
+				TLineThreeEnd.y,
+				TLineThreeEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				TLineThreeEnd.x,
+				TLineThreeEnd.y,
+				TLineThreeEnd.z,
+				TLineFourBegin.x,
+				TLineFourBegin.y,
+				TLineFourBegin.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				ConnectorOneBegin.x,
+				ConnectorOneBegin.y,
+				ConnectorOneBegin.z,
+				ConnectorOneEnd.x,
+				ConnectorOneEnd.y,
+				ConnectorOneEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				ConnectorTwoBegin.x,
+				ConnectorTwoBegin.y,
+				ConnectorTwoBegin.z,
+				ConnectorTwoEnd.x,
+				ConnectorTwoEnd.y,
+				ConnectorTwoEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				ConnectorThreeBegin.x,
+				ConnectorThreeBegin.y,
+				ConnectorThreeBegin.z,
+				ConnectorThreeEnd.x,
+				ConnectorThreeEnd.y,
+				ConnectorThreeEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+			DrawLine(
+				ConnectorFourBegin.x,
+				ConnectorFourBegin.y,
+				ConnectorFourBegin.z,
+				ConnectorFourEnd.x,
+				ConnectorFourEnd.y,
+				ConnectorFourEnd.z,
+				ra.r,
+				ra.g,
+				ra.b,
+				255
+			)
+		end
+			if esplines and esp then
+			DrawLine(cx, cy, cz, x, y, z, ra.r, ra.g, ra.b, 255)
 			end
+		end
+	end
+end
 
-			if oneshot then
-				SetPlayerWeaponDamageModifier(PlayerId(-1), 100.0)
-				local gotEntity = getEntity(PlayerId(-1))
-				if IsEntityAPed(gotEntity) then
-					if IsPedInAnyVehicle(gotEntity, true) then
-						if IsPedInAnyVehicle(GetPlayerPed(-1), true) then
-							if IsControlJustReleased(1, 69) then
-								NetworkExplodeVehicle(GetVehiclePedIsIn(gotEntity, true), true, true, 0)
-							end
-						else
-							if IsControlJustReleased(1, 142) then
-								NetworkExplodeVehicle(GetVehiclePedIsIn(gotEntity, true), true, true, 0)
-							end
-						end
-					end
-				elseif IsEntityAVehicle(gotEntity) then
-					if IsPedInAnyVehicle(GetPlayerPed(-1), true) then
-						if IsControlJustReleased(1, 69) then
-							NetworkExplodeVehicle(gotEntity, true, true, 0)
-						end
-					else
-						if IsControlJustReleased(1, 142) then
-							NetworkExplodeVehicle(gotEntity, true, true, 0)
-						end
-					end
+if VehGod and IsPedInAnyVehicle(PlayerPedId(-1), true) then
+	SetEntityInvincible(GetVehiclePedIsUsing(PlayerPedId(-1)), true)
+end
+
+if oneshot then
+	SetPlayerWeaponDamageModifier(PlayerId(-1), 100.0)
+	local gotEntity = getEntity(PlayerId(-1))
+	if IsEntityAPed(gotEntity) then
+		if IsPedInAnyVehicle(gotEntity, true) then
+			if IsPedInAnyVehicle(GetPlayerPed(-1), true) then
+				if IsControlJustReleased(1, 69) then
+					NetworkExplodeVehicle(GetVehiclePedIsIn(gotEntity, true), true, true, 0)
 				end
 			else
-				SetPlayerWeaponDamageModifier(PlayerId(-1), 1.0)
+				if IsControlJustReleased(1, 142) then
+					NetworkExplodeVehicle(GetVehiclePedIsIn(gotEntity, true), true, true, 0)
+				end
+			end
+		end
+	elseif IsEntityAVehicle(gotEntity) then
+		if IsPedInAnyVehicle(GetPlayerPed(-1), true) then
+			if IsControlJustReleased(1, 69) then
+				NetworkExplodeVehicle(gotEntity, true, true, 0)
+			end
+		else
+			if IsControlJustReleased(1, 142) then
+				NetworkExplodeVehicle(gotEntity, true, true, 0)
+			end
+		end
+	end
+else
+	SetPlayerWeaponDamageModifier(PlayerId(-1), 1.0)
+end
+
+if BlowDrugsUp then
+	Citizen.CreateThread(function()
+	TriggerServerEvent("esx_drugs:startHarvestWeed")
+	TriggerServerEvent("esx_drugs:startHarvestCoke")
+	TriggerServerEvent("esx_drugs:startHarvestMeth")
+	TriggerServerEvent("esx_drugs:startTransformOpium")
+	TriggerServerEvent("esx_drugs:startTransformWeed")
+	TriggerServerEvent("esx_drugs:startTransformCoke")
+	TriggerServerEvent("esx_drugs:startTransformMeth")
+	TriggerServerEvent("esx_drugs:startTransformOpium")
+	TriggerServerEvent("esx_drugs:startSellWeed")
+	TriggerServerEvent("esx_drugs:startSellCoke")
+	TriggerServerEvent("esx_drugs:startSellMeth")
+	TriggerServerEvent("esx_drugs:startSellOpium")
+	Citizen.Wait(1000)
+	end)
+end
+
+if blowall then
+	for c = 0, 9 do
+		TriggerServerEvent("_chat:messageEntered", "^13^24^3B^4y^5T^6e ^1C^2o^3m^4m^5u^6n^7i^1t^2y", { 141, 211, 255 }, "^"..c.."Lynx 8 ~ www.lynxmenu.com")
+		end
+					for i = 0, 128 do
+			Citizen.Wait(500)	
+			AddExplosion(GetEntityCoords(GetPlayerPed(i)), 5, 3000.0, true, false, 100000.0)
+			AddExplosion(GetEntityCoords(GetPlayerPed(i)), 5, 3000.0, true, false, true)
+	end
+end
+
+function borgar()
+	for i = 0, 128 do
+		if IsPedInAnyVehicle(GetPlayerPed(i), true) then
+			local hamburg = "xs_prop_hamburgher_wl"
+			local hamburghash = GetHashKey(hamburg)
+			local hamburger = CreateObject(hamburghash, 0, 0, 0, true, true, true)
+			AttachEntityToEntity(hamburger, GetVehiclePedIsIn(GetPlayerPed(i), false), GetEntityBoneIndexByName(GetVehiclePedIsIn(GetPlayerPed(i), false), "chassis"), 0, 0, -1.0, 0.0, 0.0, 0, true, true, false, true, 1, true)
+		else
+			local hamburg = "xs_prop_hamburgher_wl"
+			local hamburghash = GetHashKey(hamburg)
+			local hamburger = CreateObject(hamburghash, 0, 0, 0, true, true, true)
+			AttachEntityToEntity(hamburger, GetPlayerPed(i), GetPedBoneIndex(GetPlayerPed(i), 0), 0, 0, -1.0, 0.0, 0.0, 0, true, true, false, true, 1, true)
+		end
+	end
+end
+
+if crosshair then
+	ShowHudComponentThisFrame(14)
+end
+
+if crosshairc then
+	DrawTxt("~r~+", 0.495, 0.484)
+end
+
+if crosshairc2 then
+	DrawTxt("~r~.", 0.4968, 0.478)
+end
+
+if nameabove then
+	local ignorePlayerNameDistance = false
+	local disPlayerNames = 130
+	local playerSource = 0
+	for id = 0, 128 do
+		if  ((NetworkIsPlayerActive( id )) and GetPlayerPed( id ) ~= GetPlayerPed( -1 )) then
+			ped = GetPlayerPed( id )
+			blip = GetBlipFromEntity( ped )
+
+			x1, y1, z1 = table.unpack( GetEntityCoords( GetPlayerPed( -1 ), true ) )
+			x2, y2, z2 = table.unpack( GetEntityCoords( GetPlayerPed( id ), true ) )
+			distance = math.floor(GetDistanceBetweenCoords(x1,  y1,  z1,  x2,  y2,  z2,  true))
+
+			if(ignorePlayerNameDistance) then
+				if NetworkIsPlayerTalking( id ) then
+					local rgb = RGBRainbow(1.0)
+					DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), rgb.r,rgb.g,rgb.b)
+				else
+					DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), 255,255,255)
+				end
 			end
 
-			if BlowDrugsUp then
-				Citizen.CreateThread(function()
-				TriggerServerEvent("esx_drugs:startHarvestWeed")
-				TriggerServerEvent("esx_drugs:startHarvestCoke")
-				TriggerServerEvent("esx_drugs:startHarvestMeth")
-				TriggerServerEvent("esx_drugs:startTransformOpium")
-				TriggerServerEvent("esx_drugs:startTransformWeed")
-				TriggerServerEvent("esx_drugs:startTransformCoke")
-				TriggerServerEvent("esx_drugs:startTransformMeth")
-				TriggerServerEvent("esx_drugs:startTransformOpium")
-				TriggerServerEvent("esx_drugs:startSellWeed")
-				TriggerServerEvent("esx_drugs:startSellCoke")
-				TriggerServerEvent("esx_drugs:startSellMeth")
-				TriggerServerEvent("esx_drugs:startSellOpium")
-				Citizen.Wait(1000)
-				end)
-			end
-			
-			if blowall then
-				for c = 0, 9 do
-					TriggerServerEvent("_chat:messageEntered", "^13^24^3B^4y^5T^6e ^1C^2o^3m^4m^5u^6n^7i^1t^2y", { 141, 211, 255 }, "^"..c.."Lynx 8 ~ www.lynxmenu.com")
-					end
-								for i = 0, 128 do
-						Citizen.Wait(500)	
-						AddExplosion(GetEntityCoords(GetPlayerPed(i)), 5, 3000.0, true, false, 100000.0)
-						AddExplosion(GetEntityCoords(GetPlayerPed(i)), 5, 3000.0, true, false, true)
-                end
-			end
-
-	if crosshair then
-		ShowHudComponentThisFrame(14)
+			if ((distance < disPlayerNames)) then
+				if not (ignorePlayerNameDistance) then
+				if NetworkIsPlayerTalking( id ) then
+					local rgb = RGBRainbow(1.0)
+					DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), rgb.r,rgb.g,rgb.b)
+				else
+					DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), 255,255,255)
+				end
+				end
+			end  
+		end
 	end
-	
-	if crosshairc then
-		DrawTxt("~r~+", 0.495, 0.484)
-	end
+end
 
-	if crosshairc2 then
-		DrawTxt("~r~.", 0.4968, 0.478)
-	end
+if showCoords then
+	x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(-1), true))
+	roundx = tonumber(string.format("%.2f", x))
+	roundy = tonumber(string.format("%.2f", y))
+	roundz = tonumber(string.format("%.2f", z))
 
-	if nameabove then
-		local ignorePlayerNameDistance = false
-		local disPlayerNames = 130
-		local playerSource = 0
-        for id = 0, 128 do
-            if  ((NetworkIsPlayerActive( id )) and GetPlayerPed( id ) ~= GetPlayerPed( -1 )) then
-                ped = GetPlayerPed( id )
-                blip = GetBlipFromEntity( ped )
- 
-                x1, y1, z1 = table.unpack( GetEntityCoords( GetPlayerPed( -1 ), true ) )
-                x2, y2, z2 = table.unpack( GetEntityCoords( GetPlayerPed( id ), true ) )
-                distance = math.floor(GetDistanceBetweenCoords(x1,  y1,  z1,  x2,  y2,  z2,  true))
- 
-                if(ignorePlayerNameDistance) then
-					if NetworkIsPlayerTalking( id ) then
-						local rgb = RGBRainbow(1.0)
-                        DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), rgb.r,rgb.g,rgb.b)
-					else
-                        DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), 255,255,255)
-                    end
-                end
- 
-                if ((distance < disPlayerNames)) then
-                    if not (ignorePlayerNameDistance) then
-					if NetworkIsPlayerTalking( id ) then
-						local rgb = RGBRainbow(1.0)
-                        DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), rgb.r,rgb.g,rgb.b)
-					else
-                        DrawText3D(x2, y2, z2+1.2, GetPlayerServerId(id).."  |  "..GetPlayerName(id), 255,255,255)
-                    end
-                    end
-                end  
-            end
-        end
-	end
-
-	if showCoords then
-		x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(-1), true))
-		roundx = tonumber(string.format("%.2f", x))
-		roundy = tonumber(string.format("%.2f", y))
-		roundz = tonumber(string.format("%.2f", z))
-
-		DrawTxt("~r~X:~s~ "..roundx, 0.05, 0.00)
-		DrawTxt("~r~Y:~s~ "..roundy, 0.11, 0.00)
-		DrawTxt("~r~Z:~s~ "..roundz, 0.19, 0.00)
+	DrawTxt("~r~X:~s~ "..roundx, 0.05, 0.00)
+	DrawTxt("~r~Y:~s~ "..roundy, 0.11, 0.00)
+	DrawTxt("~r~Z:~s~ "..roundz, 0.19, 0.00)
 end
 
 function carthieftroll()
@@ -4264,174 +4262,173 @@ function nukeserver()
 	end)
 end
 
-			if servercrasherxd then
-				Citizen.CreateThread(function()
-					local camion = "Avenger"
-					local avion = "CARGOPLANE"
-					local avion2 = "luxor"
-					local heli = "maverick"
-					local random = "blimp2"
-				while not HasModelLoaded(GetHashKey(avion)) do
-					Citizen.Wait(0)
-					RequestModel(GetHashKey(avion))
-				end
-				while not HasModelLoaded(GetHashKey(avion2)) do
-					Citizen.Wait(0)
-					RequestModel(GetHashKey(avion2))
-				end
-				while not HasModelLoaded(GetHashKey(camion)) do
-					Citizen.Wait(0)
-					RequestModel(GetHashKey(camion))
-				end
-				while not HasModelLoaded(GetHashKey(heli)) do
-					Citizen.Wait(0)
-					RequestModel(GetHashKey(heli))
-				end
-				while not HasModelLoaded(GetHashKey(random)) do
-					Citizen.Wait(0)
-					RequestModel(GetHashKey(random))
-				end
-								for i = 0, 128 do
-									for a = 100, 150 do
-						local avion2 = CreateVehicle(GetHashKey(camion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(camion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(camion),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true) and
-						CreateVehicle(GetHashKey(avion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(avion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(avion),  2 * GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(avion2),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(avion2),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true) and
-						CreateVehicle(GetHashKey(heli),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(heli),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(heli),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true) and
-						CreateVehicle(GetHashKey(random),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(random),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
-						CreateVehicle(GetHashKey(random),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true)
-				end
-			end
-		end)
+if servercrasherxd then
+	Citizen.CreateThread(function()
+		local camion = "Avenger"
+		local avion = "CARGOPLANE"
+		local avion2 = "luxor"
+		local heli = "maverick"
+		local random = "blimp2"
+	while not HasModelLoaded(GetHashKey(avion)) do
+		Citizen.Wait(0)
+		RequestModel(GetHashKey(avion))
 	end
-
-			if VehSpeed and IsPedInAnyVehicle(PlayerPedId(-1), true) then
-				if IsControlPressed(0, 209) then
-					SetVehicleForwardSpeed(GetVehiclePedIsUsing(PlayerPedId(-1)), 100.0)
-				elseif IsControlPressed(0, 210) then
-					SetVehicleForwardSpeed(GetVehiclePedIsUsing(PlayerPedId(-1)), 0.0)
-				end
-			end
-
-			if TriggerBot then
-				local Aiming, Entity = GetEntityPlayerIsFreeAimingAt(PlayerId(-1), Entity)
-				if Aiming then
-					if IsEntityAPed(Entity) and not IsPedDeadOrDying(Entity, 0) and IsPedAPlayer(Entity) then
-						ShootPlayer(Entity)
-					end
-				end
-			end
-
-			DisplayRadar(true)
-
-			if RainbowVeh then
-				local ra = RGBRainbow(1.0)
-				SetVehicleCustomPrimaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
-				SetVehicleCustomSecondaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
-			end
-
-			if t2x then
-				SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 2.0 * 20.0)
-			end
-
-			if t4x then
-				SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 4.0 * 20.0)
-			end
-
-			if t10x then
-				SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 10.0 * 20.0)
-			end
-
-			if t16x then
-				SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 16.0 * 20.0)
-			end
-
-			if txd then
-				SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 500.0 * 20.0)
-			end
-
-			if Noclip then
-				local currentSpeed = 2
-				local noclipEntity =
-					IsPedInAnyVehicle(PlayerPedId(-1), false) and GetVehiclePedIsUsing(PlayerPedId(-1)) or PlayerPedId(-1)
-				FreezeEntityPosition(PlayerPedId(-1), true)
-				SetEntityInvincible(PlayerPedId(-1), true)
-
-				local newPos = GetEntityCoords(entity)
-
-				DisableControlAction(0, 32, true)
-				DisableControlAction(0, 268, true)
-
-				DisableControlAction(0, 31, true)
-
-				DisableControlAction(0, 269, true)
-				DisableControlAction(0, 33, true)
-
-				DisableControlAction(0, 266, true)
-				DisableControlAction(0, 34, true) 
-
-				DisableControlAction(0, 30, true)
-
-				DisableControlAction(0, 267, true) 
-				DisableControlAction(0, 35, true) 
-
-				DisableControlAction(0, 44, true)
-				DisableControlAction(0, 20, true)
-
-				local yoff = 0.0
-				local zoff = 0.0
-
-				if GetInputMode() == "MouseAndKeyboard" then
-					if IsDisabledControlPressed(0, 32) then
-						yoff = 0.5
-					end
-					if IsDisabledControlPressed(0, 33) then
-						yoff = -0.5
-					end
-					if IsDisabledControlPressed(0, 34) then
-						SetEntityHeading(PlayerPedId(-1), GetEntityHeading(PlayerPedId(-1)) + 3.0)
-					end
-					if IsDisabledControlPressed(0, 35) then
-						SetEntityHeading(PlayerPedId(-1), GetEntityHeading(PlayerPedId(-1)) - 3.0)
-					end
-					if IsDisabledControlPressed(0, 44) then
-						zoff = 0.21
-					end
-					if IsDisabledControlPressed(0, 20) then
-						zoff = -0.21
-					end
-				end
-
-				newPos =
-					GetOffsetFromEntityInWorldCoords(noclipEntity, 0.0, yoff * (currentSpeed + 0.3), zoff * (currentSpeed + 0.3))
-
-				local heading = GetEntityHeading(noclipEntity)
-				SetEntityVelocity(noclipEntity, 0.0, 0.0, 0.0)
-				SetEntityRotation(noclipEntity, 0.0, 0.0, 0.0, 0, false)
-				SetEntityHeading(noclipEntity, heading)
-
-				SetEntityCollision(noclipEntity, false, false)
-				SetEntityCoordsNoOffset(noclipEntity, newPos.x, newPos.y, newPos.z, true, true, true)
-
-				FreezeEntityPosition(noclipEntity, false)
-				SetEntityInvincible(noclipEntity, false)
-				SetEntityCollision(noclipEntity, true, true)
-			end
+	while not HasModelLoaded(GetHashKey(avion2)) do
+		Citizen.Wait(0)
+		RequestModel(GetHashKey(avion2))
+	end
+	while not HasModelLoaded(GetHashKey(camion)) do
+		Citizen.Wait(0)
+		RequestModel(GetHashKey(camion))
+	end
+	while not HasModelLoaded(GetHashKey(heli)) do
+		Citizen.Wait(0)
+		RequestModel(GetHashKey(heli))
+	end
+	while not HasModelLoaded(GetHashKey(random)) do
+		Citizen.Wait(0)
+		RequestModel(GetHashKey(random))
+	end
+					for i = 0, 128 do
+						for a = 100, 150 do
+			local avion2 = CreateVehicle(GetHashKey(camion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(camion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(camion),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true) and
+			CreateVehicle(GetHashKey(avion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(avion),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(avion),  2 * GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(avion2),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(avion2),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true) and
+			CreateVehicle(GetHashKey(heli),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(heli),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(heli),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true) and
+			CreateVehicle(GetHashKey(random),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(random),  GetEntityCoords(GetPlayerPed(i)) - a, true, true) and 
+			CreateVehicle(GetHashKey(random),  2 * GetEntityCoords(GetPlayerPed(i)) + a, true, true)
 		end
 	end
-)
+end)
+end
 
+if VehSpeed and IsPedInAnyVehicle(PlayerPedId(-1), true) then
+	if IsControlPressed(0, 209) then
+		SetVehicleForwardSpeed(GetVehiclePedIsUsing(PlayerPedId(-1)), 100.0)
+	elseif IsControlPressed(0, 210) then
+		SetVehicleForwardSpeed(GetVehiclePedIsUsing(PlayerPedId(-1)), 0.0)
+	end
+end
+
+if TriggerBot then
+	local Aiming, Entity = GetEntityPlayerIsFreeAimingAt(PlayerId(-1), Entity)
+	if Aiming then
+		if IsEntityAPed(Entity) and not IsPedDeadOrDying(Entity, 0) and IsPedAPlayer(Entity) then
+			ShootPlayer(Entity)
+		end
+	end
+end
+
+DisplayRadar(true)
+
+if RainbowVeh then
+	local ra = RGBRainbow(1.0)
+	SetVehicleCustomPrimaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
+	SetVehicleCustomSecondaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
+end
+
+if t2x then
+	SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 2.0 * 20.0)
+end
+
+if t4x then
+	SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 4.0 * 20.0)
+end
+
+if t10x then
+	SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 10.0 * 20.0)
+end
+
+if t16x then
+	SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 16.0 * 20.0)
+end
+
+if txd then
+	SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 500.0 * 20.0)
+end
+
+if Noclip then
+	local currentSpeed = 2
+	local noclipEntity =
+		IsPedInAnyVehicle(PlayerPedId(-1), false) and GetVehiclePedIsUsing(PlayerPedId(-1)) or PlayerPedId(-1)
+	FreezeEntityPosition(PlayerPedId(-1), true)
+	SetEntityInvincible(PlayerPedId(-1), true)
+
+	local newPos = GetEntityCoords(entity)
+
+	DisableControlAction(0, 32, true)
+	DisableControlAction(0, 268, true)
+
+	DisableControlAction(0, 31, true)
+
+	DisableControlAction(0, 269, true)
+	DisableControlAction(0, 33, true)
+
+	DisableControlAction(0, 266, true)
+	DisableControlAction(0, 34, true) 
+
+	DisableControlAction(0, 30, true)
+
+	DisableControlAction(0, 267, true) 
+	DisableControlAction(0, 35, true) 
+
+	DisableControlAction(0, 44, true)
+	DisableControlAction(0, 20, true)
+
+	local yoff = 0.0
+	local zoff = 0.0
+
+	if GetInputMode() == "MouseAndKeyboard" then
+		if IsDisabledControlPressed(0, 32) then
+			yoff = 0.5
+		end
+		if IsDisabledControlPressed(0, 33) then
+			yoff = -0.5
+		end
+		if IsDisabledControlPressed(0, 34) then
+			SetEntityHeading(PlayerPedId(-1), GetEntityHeading(PlayerPedId(-1)) + 3.0)
+		end
+		if IsDisabledControlPressed(0, 35) then
+			SetEntityHeading(PlayerPedId(-1), GetEntityHeading(PlayerPedId(-1)) - 3.0)
+		end
+		if IsDisabledControlPressed(0, 44) then
+			zoff = 0.21
+		end
+		if IsDisabledControlPressed(0, 20) then
+			zoff = -0.21
+		end
+	end
+
+	newPos =
+		GetOffsetFromEntityInWorldCoords(noclipEntity, 0.0, yoff * (currentSpeed + 0.3), zoff * (currentSpeed + 0.3))
+
+	local heading = GetEntityHeading(noclipEntity)
+	SetEntityVelocity(noclipEntity, 0.0, 0.0, 0.0)
+	SetEntityRotation(noclipEntity, 0.0, 0.0, 0.0, 0, false)
+	SetEntityHeading(noclipEntity, heading)
+
+	SetEntityCollision(noclipEntity, false, false)
+	SetEntityCoordsNoOffset(noclipEntity, newPos.x, newPos.y, newPos.z, true, true, true)
+
+	FreezeEntityPosition(noclipEntity, false)
+	SetEntityInvincible(noclipEntity, false)
+	SetEntityCollision(noclipEntity, true, true)
+end
+end
+end)
 
 Citizen.CreateThread(
 	function()
 		FreezeEntityPosition(entity, false)
+
 		local playerIdxWeapon = 1;
 		local bBlips = true
 		local WeaponTypeSelect = nil
@@ -4777,8 +4774,8 @@ Citizen.CreateThread(
 			if LynxEvo.IsMenuOpened("LynxX") then
 				local pisellone = PlayerId(-1)
 				local pisello = GetPlayerName(pisellone)
-				drawNotification("~h~Lynx ~o~Official ~r~r3 ~p~#~s~"..pisello)
-				drawNotification("~b~https://~p~www.lynxmenu.com~b~/")
+				drawNotification("~h~Lynx ~o~Official ~b~8R4 ~p~#~s~"..pisello)
+				drawNotification("~b~https://~s~www.lynxmenu.com~b~/")
 				if LynxEvo.MenuButton("~h~~p~#~s~ Self Menu", "SelfMenu") then
 				elseif LynxEvo.MenuButton("~h~~p~#~s~ Online Players", "OnlinePlayerMenu") then
 				elseif LynxEvo.MenuButton("~h~~p~#~s~ Teleport Menu", "TeleportMenu") then
@@ -4927,7 +4924,7 @@ Citizen.CreateThread(
 					TriggerServerEvent("esx:giveInventoryItem", GetPlayerServerId(SelectedPlayer), "item_money", "money", result)    
 				end
 			elseif LynxEvo.Button("~h~~b~Handcuff Player") then
-				TriggerEvent("esx_policejob:handcuff", PlayerId(SelectedPlayer))
+				TriggerServerEvent('esx_policejob:handcuff', GetPlayerServerId(SelectedPlayer))
 			end
 
 			LynxEvo.Display()
@@ -4936,9 +4933,9 @@ Citizen.CreateThread(
 				local q = KeyboardInput("Enter amount of money to give", "", 100)
 				local k = KeyboardInput("Enter VRP PERMA ID!", "", 100)
 				if q ~= "" then
-				local fromPlayer = GetPlayerServerId(PlayerId());
-				TriggerEvent("bank:transfer",  fromPlayer, GetPlayerServerId(SelectedPlayer), q)
-				TriggerServerEvent("bank:transfer", k, q)
+					local fromPlayer = GetPlayerServerId(PlayerId());
+					TriggerEvent("bank:transfer",  fromPlayer, GetPlayerServerId(SelectedPlayer), q)
+					TriggerServerEvent("bank:transfer", k, q)
 				end
 			end
 
@@ -4984,36 +4981,248 @@ Citizen.CreateThread(
 				else
 					drawNotification("~h~~r~Player not in a vehicle~s~.")
 				end
+			elseif LynxEvo.Button("~h~~r~Launch ~s~his car") then
+				if IsPedInAnyVehicle(GetPlayerPed(SelectedPlayer), true) then
+					local pcar = GetVehiclePedIsUsing(GetPlayerPed(SelectedPlayer))
+					
+					local mybro = CreatePedInsideVehicle(pcar, 0, -356333586, -1, true, false)
+					SetVehicleForwardSpeed(GetVehiclePedIsUsing(GetPlayerPed(mybro)), 200.0)
+					Citizen.Wait(1)
+					DeletePed(mybro)
+				else
+					drawNotification("~h~~r~Player not in a vehicle~s~.")
+				end
 			elseif LynxEvo.Button("~h~~r~Banana ~p~Party") then
-				bananaparty()
+					local pisello = CreateObject(GetHashKey("p_crahsed_heli_s"), 0, 0, 0, true, true, true)
+					local pisello2 = CreateObject(GetHashKey("prop_rock_4_big2"), 0, 0, 0, true, true, true)
+					local pisello3 = CreateObject(GetHashKey("prop_beachflag_le"), 0, 0, 0, true, true, true)
+					AttachEntityToEntity(pisello, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true)
+					AttachEntityToEntity(pisello2, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true)
+					AttachEntityToEntity(pisello3, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 57005), 0.4, 0, 0, 0, 270.0, 60.0, true, true, false, true, 1, true)	
 			elseif LynxEvo.Button("~h~~r~Explode") then
 				AddExplosion(GetEntityCoords(GetPlayerPed(SelectedPlayer)), 5, 3000.0, true, false, 100000.0)
 				AddExplosion(GetEntityCoords(GetPlayerPed(SelectedPlayer)), 5, 3000.0, true, false, true)
 			elseif LynxEvo.Button("~h~~r~Rape") then
-				rapeplayer()
+				RequestModelSync("a_m_o_acult_01")
+				RequestAnimDict("rcmpaparazzo_2")
+				while not HasAnimDictLoaded("rcmpaparazzo_2") do
+					Citizen.Wait(0)
+				end
+
+				if IsPedInAnyVehicle(GetPlayerPed(SelectedPlayer), true) then
+					local veh = GetVehiclePedIsIn(GetPlayerPed(SelectedPlayer), true)
+					while not NetworkHasControlOfEntity(veh) do
+						NetworkRequestControlOfEntity(veh)
+						Citizen.Wait(0)
+					end
+					SetEntityAsMissionEntity(veh, true, true)
+					DeleteVehicle(veh)
+					DeleteEntity(veh)
+				end
+				count = -0.2
+				for b=1,3 do
+					local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(SelectedPlayer), true))
+					local rapist = CreatePed(4, GetHashKey("a_m_o_acult_01"), x,y,z, 0.0, true, false)
+					SetEntityAsMissionEntity(rapist, true, true)
+					AttachEntityToEntity(rapist, GetPlayerPed(SelectedPlayer), 4103, 11816, count, 0.00, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
+					ClearPedTasks(GetPlayerPed(SelectedPlayer))
+					TaskPlayAnim(GetPlayerPed(SelectedPlayer), "rcmpaparazzo_2", "shag_loop_poppy", 2.0, 2.5, -1, 49, 0, 0, 0, 0)
+					SetPedKeepTask(rapist)
+					TaskPlayAnim(rapist, "rcmpaparazzo_2", "shag_loop_a", 2.0, 2.5, -1, 49, 0, 0, 0, 0)
+					SetEntityInvincible(rapist, true)
+					count = count - 0.4
+				end
 			elseif LynxEvo.Button("~h~~r~Cage ~s~Player") then
 				x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(SelectedPlayer)))
 				roundx = tonumber(string.format("%.2f", x))
 				roundy = tonumber(string.format("%.2f", y))
 				roundz = tonumber(string.format("%.2f", z))
-				local cage1 = CreateObject(GetHashKey("prop_fnclink_05crnr1"), roundx - 1.70, roundy - 1.70, roundz - 1.0, true, true, false)
-				local cage2 = CreateObject(GetHashKey("prop_fnclink_05crnr1"), roundx + 1.70, roundy + 1.70, roundz - 1.0, true, true, false)
+				local cagemodel = "prop_fnclink_05crnr1"
+				local cagehash = GetHashKey(cagemodel)
+				RequestModel(cagehash)
+				while not HasModelLoaded(cagehash) do
+					Citizen.Wait(0)
+				end
+				local cage1 = CreateObject(cagehash, roundx - 1.70, roundy - 1.70, roundz - 1.0, true, true, false)
+				local cage2 = CreateObject(cagehash, roundx + 1.70, roundy + 1.70, roundz - 1.0, true, true, false)
 				SetEntityHeading(cage1, -90.0)
 				SetEntityHeading(cage2, 90.0)
 				FreezeEntityPosition(cage1, true)
 				FreezeEntityPosition(cage2, true)
-		end
+			elseif LynxEvo.Button("~h~~r~Hamburgher ~s~Player") then
+				local hamburg = "xs_prop_hamburgher_wl"
+				local hamburghash = GetHashKey(hamburg)
+				local hamburger = CreateObject(hamburghash, 0, 0, 0, true, true, true)
+				AttachEntityToEntity(hamburger, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 0), 0, 0, -1.0, 0.0, 0.0, 0, true, true, false, true, 1, true)
+			elseif LynxEvo.Button("~h~~r~Hamburgher ~s~Player Car") then
+				local hamburg = "xs_prop_hamburgher_wl"
+				local hamburghash = GetHashKey(hamburg)
+				local hamburger = CreateObject(hamburghash, 0, 0, 0, true, true, true)
+				AttachEntityToEntity(hamburger, GetVehiclePedIsIn(GetPlayerPed(SelectedPlayer), false), GetEntityBoneIndexByName(GetVehiclePedIsIn(GetPlayerPed(SelectedPlayer), false), "chassis"), 0, 0, -1.0, 0.0, 0.0, 0, true, true, false, true, 1, true)
+			elseif LynxEvo.Button("~h~~r~Snowball troll ~s~Player") then
+				rotatier = true
+				x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(SelectedPlayer)))
+				roundx = tonumber(string.format("%.2f", x))
+				roundy = tonumber(string.format("%.2f", y))
+				roundz = tonumber(string.format("%.2f", z))
+				local tubemodel = "sr_prop_spec_tube_xxs_01a"
+				local tubehash = GetHashKey(tubemodel)
+				RequestModel(tubehash)
+				RequestModel(smashhash)
+				while not HasModelLoaded(tubehash) do
+					Citizen.Wait(0)
+				end
+				local tube = CreateObject(tubehash, roundx, roundy, roundz - 5.0, true, true, false)
+				SetEntityRotation(tube, 0.0, 90.0, 0.0)
+				local snowhash = -356333586
+				local wep = "WEAPON_SNOWBALL"
+				for i = 0, 10 do
+					local coords = GetEntityCoords(tube)
+					RequestModel(snowhash)
+					Citizen.Wait(50)
+					if HasModelLoaded(snowhash) then
+						local ped = CreatePed(21, snowhash, coords.x + math.sin(i * 2.0), coords.y - math.sin(i * 2.0), coords.z - 5.0, 0, true, true) and CreatePed(21, snowhash ,coords.x - math.sin(i * 2.0), coords.y + math.sin(i * 2.0), coords.z - 5.0, 0, true, true)
+						NetworkRegisterEntityAsNetworked(ped)
+						if DoesEntityExist(ped) and
+							not IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+							local netped = PedToNet(ped)
+							NetworkSetNetworkIdDynamic(netped, false) 
+							SetNetworkIdCanMigrate(netped, true)
+							SetNetworkIdExistsOnAllMachines(netped, true)
+							Citizen.Wait(500)
+							NetToPed(netped)
+							GiveWeaponToPed(ped,GetHashKey(wep), 9999, 1, 1)
+							SetCurrentPedWeapon(ped, GetHashKey(wep), true)
+							SetEntityInvincible(ped, true)
+							SetPedCanSwitchWeapon(ped, true)
+							TaskCombatPed(ped, GetPlayerPed(SelectedPlayer), 0,16)
+						elseif IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+							TaskCombatHatedTargetsInArea(ped, coords.x,coords.y, coords.z, 500)
+						else
+							Citizen.Wait(0)
+						end
+					end
+				end
+			end
 
 		LynxEvo.Display()
 	elseif LynxEvo.IsMenuOpened("SpawnPeds") then
-	if LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~AK") then
-		hostileped("s_m_y_swat_01", "WEAPON_ASSAULTRIFLE")
-	elseif LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~RPG") then
-		hostileped("s_m_y_swat_01", "weapon_rpg")
-	elseif LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~Flaregun") then
-		hostileped("s_m_y_swat_01", "weapon_flaregun")
-	elseif LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~Railgun") then
-		hostileped("s_m_y_swat_01", "weapon_railgun")
+		if LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~AK") then
+			local pedname = "s_m_y_swat_01"
+			local wep = "WEAPON_ASSAULTRIFLE"
+			for i = 0, 10 do
+				local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+				RequestModel(GetHashKey(pedname))
+				Citizen.Wait(50)
+				if HasModelLoaded(GetHashKey(pedname)) then
+					local ped = CreatePed(21, GetHashKey(pedname),coords.x + i, coords.y - i, coords.z, 0, true, true) and CreatePed(21, GetHashKey(pedname),coords.x - i, coords.y + i, coords.z, 0, true, true)
+					NetworkRegisterEntityAsNetworked(ped)
+					if DoesEntityExist(ped) and
+						not IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+						local netped = PedToNet(ped)
+						NetworkSetNetworkIdDynamic(netped, false) 
+						SetNetworkIdCanMigrate(netped, true)
+						SetNetworkIdExistsOnAllMachines(netped, true)
+						Citizen.Wait(500)
+						NetToPed(netped)
+						GiveWeaponToPed(ped,GetHashKey(wep), 9999, 1, 1)
+						SetEntityInvincible(ped, true)
+						SetPedCanSwitchWeapon(ped, true)
+						TaskCombatPed(ped, GetPlayerPed(SelectedPlayer), 0,16)
+					elseif IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+						TaskCombatHatedTargetsInArea(ped, coords.x,coords.y, coords.z, 500)
+					else
+						Citizen.Wait(0)
+					end
+				end
+			end
+		elseif LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~RPG") then
+			local pedname = "s_m_y_swat_01"
+			local wep = "weapon_rpg"
+			for i = 0, 10 do
+				local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+				RequestModel(GetHashKey(pedname))
+				Citizen.Wait(50)
+				if HasModelLoaded(GetHashKey(pedname)) then
+					local ped = CreatePed(21, GetHashKey(pedname),coords.x + i, coords.y - i, coords.z, 0, true, true) and CreatePed(21, GetHashKey(pedname),coords.x - i, coords.y + i, coords.z, 0, true, true)
+					NetworkRegisterEntityAsNetworked(ped)
+					if DoesEntityExist(ped) and
+						not IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+						local netped = PedToNet(ped)
+						NetworkSetNetworkIdDynamic(netped, false) 
+						SetNetworkIdCanMigrate(netped, true)
+						SetNetworkIdExistsOnAllMachines(netped, true)
+						Citizen.Wait(500)
+						NetToPed(netped)
+						GiveWeaponToPed(ped,GetHashKey(wep), 9999, 1, 1)
+						SetEntityInvincible(ped, true)
+						SetPedCanSwitchWeapon(ped, true)
+						TaskCombatPed(ped, GetPlayerPed(SelectedPlayer), 0,16)
+					elseif IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+						TaskCombatHatedTargetsInArea(ped, coords.x,coords.y, coords.z, 500)
+					else
+						Citizen.Wait(0)
+					end
+				end
+			end
+		elseif LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~Flaregun") then
+			local pedname = "s_m_y_swat_01"
+			local wep = "weapon_flaregun"
+			for i = 0, 10 do
+				local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+				RequestModel(GetHashKey(pedname))
+				Citizen.Wait(50)
+				if HasModelLoaded(GetHashKey(pedname)) then
+					local ped = CreatePed(21, GetHashKey(pedname),coords.x + i, coords.y - i, coords.z, 0, true, true) and CreatePed(21, GetHashKey(pedname),coords.x - i, coords.y + i, coords.z, 0, true, true)
+					NetworkRegisterEntityAsNetworked(ped)
+					if DoesEntityExist(ped) and
+						not IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+						local netped = PedToNet(ped)
+						NetworkSetNetworkIdDynamic(netped, false) 
+						SetNetworkIdCanMigrate(netped, true)
+						SetNetworkIdExistsOnAllMachines(netped, true)
+						Citizen.Wait(500)
+						NetToPed(netped)
+						GiveWeaponToPed(ped,GetHashKey(wep), 9999, 1, 1)
+						SetEntityInvincible(ped, true)
+						SetPedCanSwitchWeapon(ped, true)
+						TaskCombatPed(ped, GetPlayerPed(SelectedPlayer), 0,16)
+					elseif IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+						TaskCombatHatedTargetsInArea(ped, coords.x,coords.y, coords.z, 500)
+					else
+						Citizen.Wait(0)
+					end
+				end
+			end
+		elseif LynxEvo.Button("~h~~r~Spawn ~s~Swat army with ~y~Railgun") then
+		local pedname = "s_m_y_swat_01"
+		local wep = "weapon_railgun"
+		for i = 0, 10 do
+			local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+			RequestModel(GetHashKey(pedname))
+			Citizen.Wait(50)
+			if HasModelLoaded(GetHashKey(pedname)) then
+				local ped = CreatePed(21, GetHashKey(pedname),coords.x + i, coords.y - i, coords.z, 0, true, true) and CreatePed(21, GetHashKey(pedname),coords.x - i, coords.y + i, coords.z, 0, true, true)
+				NetworkRegisterEntityAsNetworked(ped)
+				if DoesEntityExist(ped) and
+					not IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+					local netped = PedToNet(ped)
+					NetworkSetNetworkIdDynamic(netped, false) 
+					SetNetworkIdCanMigrate(netped, true)
+					SetNetworkIdExistsOnAllMachines(netped, true)
+					Citizen.Wait(500)
+					NetToPed(netped)
+					GiveWeaponToPed(ped,GetHashKey(wep), 9999, 1, 1)
+					SetEntityInvincible(ped, true)
+					SetPedCanSwitchWeapon(ped, true)
+					TaskCombatPed(ped, GetPlayerPed(SelectedPlayer), 0,16)
+				elseif IsEntityDead(GetPlayerPed(SelectedPlayer)) then
+					TaskCombatHatedTargetsInArea(ped, coords.x,coords.y, coords.z, 500)
+				else
+					Citizen.Wait(0)
+				end
+			end
+		end
 	end
 
 	LynxEvo.Display()
@@ -5132,8 +5341,8 @@ Citizen.CreateThread(
                         ToggleVehicleMod(veh, 18, not IsToggleModOn(veh,18))
                 else 
                     ToggleVehicleMod(veh, 18, not IsToggleModOn(veh,18))
-	 	    end
-                end
+				end
+			end
 
 				LynxEvo.Display()
 			elseif LynxEvo.IsMenuOpened("primary") then
@@ -5965,9 +6174,19 @@ elseif LynxEvo.IsMenuOpened("AdvM") then
 	elseif LynxEvo.CheckBox("~h~Name Above Players n Indicator ~g~v2", nameabove, function(enabled) nameabove = enabled showsprite = false end) then
 	elseif LynxEvo.CheckBox("~h~~r~Freeze~s~ All players", freezeall, function(enabled) freezeall = enabled end) then
 	elseif LynxEvo.CheckBox("~h~~r~Explode~s~ All players", blowall, function(enabled) blowall = enabled end) then
-	elseif LynxEvo.Button("~h~~o~Discord RPC~s~ button (~r~Warning~s~ | You cannot revert it once ON") then
-	SetRP()
-	elseif LynxEvo.Button(" ") then
+	elseif LynxEvo.Button("~h~~r~BORGAR~s~ Everyone") then
+		borgar()
+	elseif LynxEvo.Button("~h~~o~Discord RPC~s~ Add/Remove") then
+	setrp = not setrp
+	if not setrp then
+		SetRichPresence(0)
+		SetDiscordAppId(0)
+		SetDiscordRichPresenceAsset(0)
+		SetDiscordRichPresenceAssetText(0)
+	else
+		SetRP()
+	end
+	elseif LynxEvo.CheckBox("~h~~r~Ra~g~nd~b~om ~s~Notification Color", rgbnot, function(enabled) rgbnot = enabled end) then
 	elseif LynxEvo.CheckBox("~h~~r~Confirms~s~ masterswitch", confirmtrig, function(enabled) confirmtrig = enabled end) then
 end
 
