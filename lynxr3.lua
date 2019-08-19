@@ -2027,7 +2027,7 @@ local Enabled = true
 local meme = GetPlayerServerId(PlayerPedId(-1))
 local memename = GetPlayerName(meme)
 drawNotification("~h~Checking for Anti Lynx Protection", true)
-TriggerServerEvent("antilynx8:anticheat", meme, memename)
+TriggerServerEvent("antilynx8r4a:anticheat", meme, memename)
 
 local function DrawTxt(text, x, y)
 	SetTextFont(0)
