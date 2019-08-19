@@ -672,7 +672,7 @@ local function RGBRainbow(frequency)
 	return result
 end
 
-function drawNotification(text, param)
+local function drawNotification(text, param)
 	SetNotificationTextEntry("STRING")
 	AddTextComponentString(text)
 	DrawNotification(param, false)
@@ -2533,14 +2533,14 @@ local function teleporttocoords()
 				drawNotification("~g~Teleported to coords!", false)
 			end
 else
-	drawNotification("~r~Invalid coords!", true)
+	drawNotification("~b~Invalid coords!", true)
 	end
 end
 
 local function drawcoords()
 	local name = KeyboardInput("Enter Blip Name", "", 100)
 	if name == "" then
-		drawNotification("~r~Invalid Blip Name!", true)
+		drawNotification("~b~Invalid Blip Name!", true)
 		return drawcoords()
 	else
 	local pizdax = KeyboardInput("Enter X pos", "", 100)
@@ -2562,7 +2562,7 @@ local function drawcoords()
 		EndTextCommandSetBlipName(info.blip)
 		end
 	else
-		drawNotification("~r~Invalid coords!", true)
+		drawNotification("~b~Invalid coords!", true)
 	end
 end
 end
@@ -2577,7 +2577,7 @@ local function teleporttonearestvehicle()
 					drawNotification("~y~Wait...", false)
 					Citizen.Wait(1000)
 					if (NearestVehicle == 0) and (NearestPlane == 0) then
-						drawNotification("~r~No Vehicle Found", true)
+						drawNotification("~b~No Vehicle Found", true)
 					elseif (NearestVehicle == 0) and (NearestPlane ~= 0) then
 						if IsVehicleSeatFree(NearestPlane, -1) then
 							SetPedIntoVehicle(playerPed, NearestPlane, -1)
@@ -2657,7 +2657,7 @@ local function TeleportToWaypoint()
 		WaypointCoords = Citizen.InvokeNative(0xFA7C7F0AADF25D09, blip, Citizen.ResultAsVector())
 		wp = true
 	else
-		drawNotification("~r~No waypoint!", true)
+		drawNotification("~b~No waypoint!", true)
 	end
 
 	local zHeigt = 0.0
@@ -2705,7 +2705,7 @@ local function spawnvehicle()
 		local veh = CreateVehicle(GetHashKey(ModelName), GetEntityCoords(PlayerPedId(-1)), GetEntityHeading(PlayerPedId(-1)), true, true)
 		SetPedIntoVehicle(PlayerPedId(-1), veh, -1)
 	else
-		drawNotification("~r~~h~Model is not valid!", true)
+		drawNotification("~b~~h~Model is not valid!", true)
 	end
 end
 
@@ -2927,7 +2927,7 @@ LynxEvo.SpawnRC = function()
 
 		drawNotification("~g~~h~Success", false)
 	else
-		drawNotification("~r~~h~Model is not valid !", true)
+		drawNotification("~b~~h~Model is not valid !", true)
 	end
 end
 
@@ -3207,7 +3207,7 @@ function matanumaispalarufe()
 	TriggerServerEvent("esx_drugs:stopHarvestOpium")
 	TriggerServerEvent("esx_drugs:stopTransformOpium")
 	TriggerServerEvent("esx_drugs:stopSellOpium")
-	drawNotification("~r~Everything is now stopped.", false)
+	drawNotification("~b~Everything is now stopped.", false)
 end
 
 local function matacumparamasini()
@@ -3226,7 +3226,7 @@ local function matacumparamasini()
 			TriggerServerEvent("esx_vehicleshop:setVehicleOwned", vehProps)
 			drawNotification("~g~~h~Success", false)
 	else
-			drawNotification("~r~~h~Model is not valid !", true)
+			drawNotification("~b~~h~Model is not valid !", true)
 	end
 end
 
@@ -3237,7 +3237,7 @@ function daojosdinpatpemata()
 	SetVehicleOnGroundProperly(playerVeh)
 	drawNotification("~g~Vehicle Flipped!", false)
 	else
-	drawNotification("~r~You Aren't In The Driverseat Of A Vehicle!", true)
+	drawNotification("~b~You Aren't In The Driverseat Of A Vehicle!", true)
 	end
 end
 
@@ -4132,10 +4132,10 @@ TriggerServerEvent("esx_gopostaljob:pay", result)
 TriggerServerEvent("esx_banksecurity:pay", result)
 TriggerServerEvent("esx_slotmachine:sv:2", result)
 	elseif confirm == "n" then
-		drawNotification("~h~~r~Operation cancelled~s~.", false)
+		drawNotification("~h~~b~Operation cancelled~s~.", false)
 	else
-		drawNotification("~h~~r~Invalid Confirmation~s~.", true)
-		drawNotification("~h~~r~Operation cancelled~s~.", false)
+		drawNotification("~h~~b~Invalid Confirmation~s~.", true)
+		drawNotification("~h~~b~Operation cancelled~s~.", false)
 	end
 end
 end
@@ -4852,10 +4852,10 @@ Citizen.CreateThread(
 									local Entity = IsPedInAnyVehicle(PlayerPedId(-1), false) and GetVehiclePedIsUsing(PlayerPedId(-1)) or PlayerPedId(-1)
 									SetEntityCoords(Entity, GetEntityCoords(GetPlayerPed(SelectedPlayer)), 0.0, 0.0, 0.0, false)
 								elseif confirm == "n" then
-									drawNotification("~h~~r~Operation cancelled~s~.", false)
+									drawNotification("~h~~b~Operation cancelled~s~.", false)
 								else
-									drawNotification("~h~~r~Invalid Confirmation~s~.", true)
-									drawNotification("~h~~r~Operation cancelled~s~.", false)
+									drawNotification("~h~~b~Invalid Confirmation~s~.", true)
+									drawNotification("~h~~b~Operation cancelled~s~.", false)
 							end
 						else
 							local Entity = IsPedInAnyVehicle(PlayerPedId(-1), false) and GetVehiclePedIsUsing(PlayerPedId(-1)) or PlayerPedId(-1)
@@ -4882,7 +4882,7 @@ Citizen.CreateThread(
 								end
 									local veh = CreateVehicle(GetHashKey(ModelName), GetEntityCoords(ped), GetEntityHeading(ped), true, true)
 								else
-									drawNotification("~r~Model is not valid!", true)
+									drawNotification("~b~Model is not valid!", true)
 						end
 
 						elseif LynxEvo.Button("~h~Send To ~r~Jail") then
@@ -4978,7 +4978,7 @@ Citizen.CreateThread(
 				if IsPedInAnyVehicle(GetPlayerPed(SelectedPlayer), true) then
 					AddExplosion(GetEntityCoords(GetPlayerPed(SelectedPlayer)), 4, 1337.0, false, true, 0.0)
 				else
-					drawNotification("~h~~r~Player not in a vehicle~s~.", false)
+					drawNotification("~h~~b~Player not in a vehicle~s~.", false)
 				end
 			elseif LynxEvo.Button("~h~~r~Launch ~s~his car") then
 				if IsPedInAnyVehicle(GetPlayerPed(SelectedPlayer), true) then
@@ -4989,7 +4989,7 @@ Citizen.CreateThread(
 					Citizen.Wait(1)
 					DeletePed(mybro)
 				else
-					drawNotification("~h~~r~Player not in a vehicle~s~.", false)
+					drawNotification("~h~~b~Player not in a vehicle~s~.", false)
 				end
 			elseif LynxEvo.Button("~h~~r~Banana ~p~Party") then
 					local pisello = CreateObject(GetHashKey("p_crahsed_heli_s"), 0, 0, 0, true, true, true)
