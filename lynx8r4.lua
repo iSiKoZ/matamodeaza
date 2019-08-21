@@ -1875,13 +1875,15 @@ local vehicleMods = {
     {name = "~h~Trim 2", id = 44},
     {name = "~h~Tank", id = 45},
     {name = "~h~Windows", id = 46},
-    {name = "~h~Livery", id = 48},
+	{name = "~h~Livery", id = 48},
+	{name = "~h~Horns", id = 14},
     {name = "~h~Wheels", id = 23},
     {name = "~h~Wheel Types", id = "wheeltypes"},
     {name = "~h~Extras", id = "extra"},
     {name = "~h~Neons", id = "neon"},
 	{name = "~h~Paint", id = "paint"},
 	{name = "~h~Headlights Color", id = "headlight"},
+	{name = "~h~Licence Plate", id = "licence"},
 }
  
  
@@ -1889,9 +1891,18 @@ local perfMods = {
     {name = "~h~~r~Engine", id = 11},
     {name = "~h~~b~Brakes", id = 12},
     {name = "~h~~g~Transmission", id = 13},
-    {name = "~h~~y~Suspension", id = 15},
+	{name = "~h~~y~Suspension", id = 15},
+	{name = "~h~~b~Armor", id = 16},
 }
  
+local licencetype = {
+	{name = "~h~Blue on White 2", id = 0},
+	{name = "~h~Blue on White 3", id = 4},
+	{name = "~h~Yellow on Blue", id = 2},
+	{name = "~h~Yellow on Black", id = 1},
+	{name = "~h~North Yankton", id = 5},
+}
+
  local headlightscolor = {
 	 {name = "~h~Default", id = -1},
 	 {name = "~h~White", id = 0},
@@ -1909,6 +1920,45 @@ local perfMods = {
 	 {name = "~h~Blacklight", id = 12},
  }
  
+local horns = {
+	["Stock Horn"] = -1,
+	["Truck Horn"] = 1,
+	["Police Horn"] = 2,
+	["Clown Horn"] = 3,
+	["Musical Horn 1"] = 4,
+	["Musical Horn 2"] = 5,
+	["Musical Horn 3"] = 6,
+	["Musical Horn 4"] = 7,
+	["Musical Horn 5"] = 8,
+	["Sad Trombone Horn"] = 9,
+	["Classical Horn 1"] = 10,
+	["Classical Horn 2"] = 11,
+	["Classical Horn 3"] = 12,
+	["Classical Horn 4"] = 13,
+	["Classical Horn 5"] = 14,
+	["Classical Horn 6"] = 15,
+	["Classical Horn 7"] = 16,
+	["Scaledo Horn"] = 17,
+	["Scalere Horn"] = 18,
+	["Salemi Horn"] = 19,
+	["Scalefa Horn"] = 20,
+	["Scalesol Horn"] = 21,
+	["Scalela Horn"] = 22,
+	["Scaleti Horn"] = 23,
+	["Scaledo Horn High"] = 24,
+	["Jazz Horn 1"] = 25,
+	["Jazz Horn 2"] = 26,
+	["Jazz Horn 3"] = 27,
+	["Jazz Loop Horn"] = 28,
+	["Starspangban Horn 1"] = 28,
+	["Starspangban Horn 2"] = 29,
+	["Starspangban Horn 3"] = 30,
+	["Starspangban Horn 4"] = 31,
+	["Classical Loop 1"] = 32,
+	["Classical Horn 8"] = 33,
+	["Classical Loop 2"] = 34,
+}
+
 local neonColors = {
     ["White"] = {255,255,255},
     ["Blue"] ={0,0,255},
@@ -3665,40 +3715,42 @@ Citizen.CreateThread(
 			end
 
 			if DeleteGun then
-				local gotEntity = getEntity(PlayerId(-1))
-				if (IsPedInAnyVehicle(GetPlayerPed(-1), true) == false) then
-					drawNotification("~g~Delete Gun Enabled!~n~~w~Use The ~b~Pistol~n~~b~Aim ~w~and ~b~Shoot ~w~To Delete!", false)
-					GiveWeaponToPed(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL"), 999999, false, true)
-					SetPedAmmo(GetPlayerPed(-1), GetHashKey("WEAPON_PISTOL"), 999999)
-					if (GetSelectedPedWeapon(GetPlayerPed(-1)) == GetHashKey("WEAPON_PISTOL")) then
-						if IsPlayerFreeAiming(PlayerId(-1)) then
-							if IsEntityAPed(gotEntity) then
-								if IsPedInAnyVehicle(gotEntity, true) then
-									if IsControlJustReleased(1, 142) then
-										SetEntityAsMissionEntity(GetVehiclePedIsIn(gotEntity, true), 1, 1)
-										DeleteEntity(GetVehiclePedIsIn(gotEntity, true))
-										SetEntityAsMissionEntity(gotEntity, 1, 1)
-										DeleteEntity(gotEntity)
-										drawNotification("~g~Deleted!", true)
-									end
-								else
-									if IsControlJustReleased(1, 142) then
-										SetEntityAsMissionEntity(gotEntity, 1, 1)
-										DeleteEntity(gotEntity)
-										drawNotification("~g~Deleted!", true)
-									end
-								end
-							else
-								if IsControlJustReleased(1, 142) then
-									SetEntityAsMissionEntity(gotEntity, 1, 1)
-									DeleteEntity(gotEntity)
-									drawNotification("~g~Deleted!", true)
-								end
-							end
-						end
-					end
-				end
-			end
+                local cB = getEntity(PlayerId(-1))
+                if IsPedInAnyVehicle(GetPlayerPed(-1), true) == false then
+                    drawNotification(
+                        '~g~Delete Gun Enabled!~n~~w~Use The ~b~Pistol~n~~b~Aim ~w~and ~b~Shoot ~w~To Delete!'
+                    )
+                    GiveWeaponToPed(GetPlayerPed(-1), GetHashKey('WEAPON_PISTOL'), 999999, false, true)
+                    SetPedAmmo(GetPlayerPed(-1), GetHashKey('WEAPON_PISTOL'), 999999)
+                    if GetSelectedPedWeapon(GetPlayerPed(-1)) == GetHashKey('WEAPON_PISTOL') then
+                        if IsPlayerFreeAiming(PlayerId(-1)) then
+                            if IsEntityAPed(cB) then
+                                if IsPedInAnyVehicle(cB, true) then
+                                    if IsControlJustReleased(1, 142) then
+                                        SetEntityAsMissionEntity(GetVehiclePedIsIn(cB, true), 1, 1)
+                                        DeleteEntity(GetVehiclePedIsIn(cB, true))
+                                        SetEntityAsMissionEntity(cB, 1, 1)
+                                        DeleteEntity(cB)
+                                        drawNotification('~g~Deleted!')
+                                    end
+                                else
+                                    if IsControlJustReleased(1, 142) then
+                                        SetEntityAsMissionEntity(cB, 1, 1)
+                                        DeleteEntity(cB)
+                                        drawNotification('~g~Deleted!')
+                                    end
+                                end
+                            else
+                                if IsControlJustReleased(1, 142) then
+                                    SetEntityAsMissionEntity(cB, 1, 1)
+                                    DeleteEntity(cB)
+                                    drawNotification('~g~Deleted!')
+                                end
+                            end
+                        end
+                    end
+                end
+            end
 
 if fuckallcars then
 	for playerVeh in EnumerateVehicles() do
@@ -4019,10 +4071,6 @@ if oneshot then
 	end
 else
 	SetPlayerWeaponDamageModifier(PlayerId(-1), 1.0)
-end
-
-if noreload then
-	PedSkipNextReloading(GetPlayerPed(-1))
 end
 
 if rainbowf then
@@ -4389,6 +4437,10 @@ if txd then
 	SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 500.0 * 20.0)
 end
 
+if tbxd then
+	SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(GetPlayerPed(-1), false), 9999.0 * 20.0)
+end
+
 if Noclip then
 	local currentSpeed = 2
 	local noclipEntity =
@@ -4664,6 +4716,46 @@ Citizen.CreateThread(
 							end
 						end
 						LynxEvo.Display()
+					elseif theItem.id == "licence" then
+
+						if LynxEvo.Button("None") then
+							SetVehicleNumberPlateTextIndex(veh, 3)
+						end
+
+						for theName, theItem in pairs(licencetype) do
+							tp = GetVehicleNumberPlateTextIndex(veh)
+
+							if tp == theItem.id and not isPreviewing then
+								pricetext = "Installed"
+							else
+								if isPreviewing and tp == theItem.id then
+									pricetext = "Previewing"
+								else
+									pricetext = "Not Installed"
+								end
+							end
+							plate = GetVehicleNumberPlateTextIndex(veh)
+							if LynxEvo.Button(theItem.name, pricetext) then
+								if not isPreviewing then
+									oldmodtype = "headlight"
+									oldmodaction = false
+									oldhead = GetVehicleNumberPlateTextIndex(veh)
+									oldmod = table.pack(oldhead)
+									SetVehicleNumberPlateTextIndex(veh, theItem.id)
+									
+									isPreviewing = true
+								elseif isPreviewing and plate == theItem.id then
+										SetVehicleNumberPlateTextIndex(veh, theItem.id)
+										isPreviewing = false
+										oldmodtype = -1
+										oldmod = -1
+								elseif isPreviewing and plate ~= theItem.id then
+									SetVehicleNumberPlateTextIndex(veh, theItem.id)
+									isPreviewing = true
+								end
+							end
+						end
+						LynxEvo.Display()
 					elseif theItem.id == "neon" then
 						
 						if LynxEvo.Button("None") then
@@ -4736,8 +4828,17 @@ Citizen.CreateThread(
 						
 					else
 						local valid = checkValidVehicleMods(theItem.id)
-						for ci,ctheItem in pairs(valid) do
-							if ctheItem.menuName == "~h~~b~Stock" then price = 0 end
+						for i,ctheItem in pairs(valid) do
+							for eh,tehEtem in pairs(horns) do
+								if eh == theItem.name and GetVehicleMod(veh,theItem.id) ~= ctheItem.data.realIndex then
+									price = "Not Installed"
+								elseif eh == theItem.name and isPreviewing and GetVehicleMod(veh,theItem.id) == ctheItem.data.realIndex then
+									price = "Previewing"
+								elseif eh == theItem.name and GetVehicleMod(veh,theItem.id) == ctheItem.data.realIndex then
+									price = "Installed"
+								end
+							end
+							if ctheItem.menuName == "~h~~b~Stock" then end
 							if theItem.name == "Horns" then
 								for chorn,HornId in pairs(horns) do
 									if HornId == ci-1 then
@@ -4746,14 +4847,10 @@ Citizen.CreateThread(
 								end
 							end
 							if ctheItem.menuName == "NULL" then
-								ctheItem.menuname = "unknown"
+								ctheItem.menuName = "unknown"
 							end
-							if LynxEvo.Button(ctheItem.menuName, price) then
-								
-								
-								
-								
-								
+							if LynxEvo.Button(ctheItem.menuName) then
+
 								if not isPreviewing then
 									oldmodtype = theItem.id
 									oldmod = GetVehicleMod(veh, theItem.id)
@@ -5368,8 +5465,7 @@ Citizen.CreateThread(
 					end
 				elseif LynxEvo.Button("~h~Give Ammo") then 
 				for i = 1, #allWeapons do AddAmmoToPed(PlayerPedId(-1), GetHashKey(allWeapons[i]), 200) end
-				elseif LynxEvo.CheckBox("~h~~r~OneShot Kill", oneshot, function(enabled) oneshot = enabled end) then
-				elseif LynxEvo.CheckBox("~h~~r~No ~s~Reload", noreload, function(enabled) noreload = enabled end) then	
+				elseif LynxEvo.CheckBox("~h~~r~OneShot Kill", oneshot, function(enabled) oneshot = enabled end) then	
 				elseif LynxEvo.CheckBox("~h~~g~R~r~a~y~i~b~n~o~b~r~o~g~w ~s~Flare Gun", rainbowf, function(enabled) rainbowf = enabled end) then
 				elseif LynxEvo.CheckBox("~h~Vehicle Gun",VehicleGun, function(enabled)VehicleGun = enabled end)  then
 				elseif LynxEvo.CheckBox("~h~Delete Gun",DeleteGun, function(enabled)DeleteGun = enabled end)  then
@@ -5393,6 +5489,9 @@ Citizen.CreateThread(
 						if LynxEvo.MenuButton(theItem.name, theItem.id) then
 						end
 					elseif theItem.id == "headlight" then
+						if LynxEvo.MenuButton(theItem.name, theItem.id) then
+						end
+					elseif theItem.id == "licence" then
 						if LynxEvo.MenuButton(theItem.name, theItem.id) then
 						end
 					else
@@ -6395,6 +6494,8 @@ elseif LynxEvo.IsMenuOpened("WeaponOptions") then
 		WeaponSelected.bInfAmmo = not WeaponSelected.bInfAmmo
 		SetPedInfiniteAmmo(GetPlayerPed(-1), WeaponSelected.bInfAmmo, GetHashKey(WeaponSelected.id))
 		SetPedInfiniteAmmoClip(GetPlayerPed(-1), true)
+		PedSkipNextReloading(GetPlayerPed(-1))
+		SetPedShootRate(GetPlayerPed(-1), 1000)
 	end
 	for k, v in pairs(WeaponSelected.mods) do
 		if LynxEvo.MenuButton("~h~~p~#~s~ ~h~~r~> ~s~"..k, "ModSelect") then
@@ -6534,6 +6635,7 @@ end
 				t10x = false
 				t16x = false
 				txd = false
+				tbxd = false
 			end) then
 			elseif LynxEvo.CheckBox("~h~Engine ~g~Torque ~s~Booster ~g~4x", t4x, function(enabled)
 				t2x = false
@@ -6541,6 +6643,7 @@ end
 				t10x = false
 				t16x = false
 				txd = false
+				tbxd = false
 			end) then
 			elseif LynxEvo.CheckBox("~h~Engine ~g~Torque ~s~Booster ~g~10x", t10x, function(enabled)
 				t2x = false
@@ -6548,6 +6651,7 @@ end
 				t10x = enabled
 				t16x = false
 				txd = false
+				tbxd = false
 			end) then
 			elseif LynxEvo.CheckBox("~h~Engine ~g~Torque ~s~Booster ~g~16x", t16x, function(enabled)
 				t2x = false
@@ -6555,6 +6659,7 @@ end
 				t10x = false
 				t16x = enabled
 				txd = false
+				tbxd = false
 			end) then
 			elseif LynxEvo.CheckBox("~h~Engine ~g~Torque ~s~Booster ~y~XD", txd, function(enabled)
 				t2x = false
@@ -6562,6 +6667,15 @@ end
 				t10x = false
 				t16x = false
 				txd = enabled
+				tbxd = false
+			end) then
+			elseif LynxEvo.CheckBox("~h~Engine ~g~Torque ~s~Booster ~y~BIG XD", tbxd, function(enabled)
+				t2x = false
+				t4x = false
+				t10x = false
+				t16x = false
+				txd = false
+				tbxd = enabled
 			end) then
 
 		end
