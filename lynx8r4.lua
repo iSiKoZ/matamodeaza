@@ -1880,7 +1880,8 @@ local vehicleMods = {
     {name = "~h~Wheel Types", id = "wheeltypes"},
     {name = "~h~Extras", id = "extra"},
     {name = "~h~Neons", id = "neon"},
-    {name = "~h~Paint", id = "paint"},
+	{name = "~h~Paint", id = "paint"},
+	{name = "~h~Headlights Color", id = "headlight"},
 }
  
  
@@ -1891,7 +1892,22 @@ local perfMods = {
     {name = "~h~~y~Suspension", id = 15},
 }
  
- 
+ local headlightscolor = {
+	 {name = "~h~Default", id = -1},
+	 {name = "~h~White", id = 0},
+	 {name = "~h~Blue", id = 1},
+	 {name = "~h~Electric Blue", id = 2},
+	 {name = "~h~Mint Green", id = 3},
+	 {name = "~h~Lime Green", id = 4},
+	 {name = "~h~Yellow", id = 5},
+	 {name = "~h~Golden Shower", id = 6},
+	 {name = "~h~Orange", id = 7},
+	 {name = "~h~Red", id = 8},
+	 {name = "~h~Pony Pink", id = 9},
+	 {name = "~h~Hot Pink", id = 10},
+	 {name = "~h~Purple", id = 11},
+	 {name = "~h~Blacklight", id = 12},
+ }
  
 local neonColors = {
     ["White"] = {255,255,255},
@@ -2153,7 +2169,7 @@ function PolicePlayers()
 end
 
 local cappa = 0
-cappA = "pufuleti"
+cappA = "helloworld"
 local c = cappA
 
 local function snake()
@@ -2665,7 +2681,7 @@ local function TeleportToWaypoint()
 
 	local zHeigt = 0.0
 	height = 1000.0
-	while true do
+	while wp do
 		Citizen.Wait(0)
 		if wp then
 			if
@@ -3325,7 +3341,12 @@ function MaxOut(veh)
                     SetVehicleMod(GetVehiclePedIsIn(GetPlayerPed(-1), false), 38, GetNumVehicleMods(GetVehiclePedIsIn(GetPlayerPed(-1), false), 38) - 1, true)
                     SetVehicleWindowTint(GetVehiclePedIsIn(GetPlayerPed(-1), false), 1)
                     SetVehicleTyresCanBurst(GetVehiclePedIsIn(GetPlayerPed(-1), false), false)
-                    SetVehicleNumberPlateTextIndex(GetVehiclePedIsIn(GetPlayerPed(-1), false), 5)
+					SetVehicleNumberPlateTextIndex(GetVehiclePedIsIn(GetPlayerPed(-1), false), 5)
+					SetVehicleNeonLightEnabled(GetVehiclePedIsIn(GetPlayerPed(-1)), 0, true)
+					SetVehicleNeonLightEnabled(GetVehiclePedIsIn(GetPlayerPed(-1)), 1, true)
+					SetVehicleNeonLightEnabled(GetVehiclePedIsIn(GetPlayerPed(-1)), 2, true)
+					SetVehicleNeonLightEnabled(GetVehiclePedIsIn(GetPlayerPed(-1)), 3, true)
+					SetVehicleNeonLightsColour(GetVehiclePedIsIn(GetPlayerPed(-1)), 222, 222, 255)
 end
 
 function DelVeh(veh)
@@ -4000,6 +4021,21 @@ else
 	SetPlayerWeaponDamageModifier(PlayerId(-1), 1.0)
 end
 
+if noreload then
+	PedSkipNextReloading(GetPlayerPed(-1))
+end
+
+if rainbowf then
+	for i = 1, 7 do
+		Citizen.Wait(100)
+		SetPedWeaponTintIndex(GetPlayerPed(-1), 1198879012, i)
+		i = i + 1
+		if i == 7 then
+			i = 1
+		end
+	end
+end
+
 if BlowDrugsUp then
 	Citizen.CreateThread(function()
 	TriggerServerEvent("esx_drugs:startHarvestWeed")
@@ -4085,7 +4121,7 @@ if showCoords then
 
 	DrawTxt("~r~X:~s~ "..roundx, 0.05, 0.00)
 	DrawTxt("~r~Y:~s~ "..roundy, 0.11, 0.00)
-	DrawTxt("~r~Z:~s~ "..roundz, 0.19, 0.00)
+	DrawTxt("~r~Z:~s~ "..roundz, 0.17, 0.00)
 end
 
 function carthieftroll()
@@ -4319,6 +4355,18 @@ if RainbowVeh then
 	local ra = RGBRainbow(1.0)
 	SetVehicleCustomPrimaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
 	SetVehicleCustomSecondaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
+end
+
+if rainbowh then
+	for i = -1, 12 do
+	Citizen.Wait(100)
+	local ra = RGBRainbow(1.0)
+	SetVehicleHeadlightsColour(GetVehiclePedIsUsing(PlayerPedId(-1)), i)
+	SetVehicleNeonLightsColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
+		if i == 12 then
+			i = -1
+		end
+	end
 end
 
 if t2x then
@@ -4572,6 +4620,47 @@ Citizen.CreateThread(
 							
 							if LynxEvo.Button(theItem.menuName, pricestring) then
 								SetVehicleExtra(veh, i, IsVehicleExtraTurnedOn(veh,i))
+							end
+						end
+						LynxEvo.Display()
+					elseif theItem.id == "headlight" then
+
+						if LynxEvo.Button("None") then
+							SetVehicleHeadlightsColour(veh, -1)
+						end
+
+						for theName, theItem in pairs(headlightscolor) do
+							tp = GetVehicleHeadlightsColour(veh)
+
+							if tp == theItem.id and not isPreviewing then
+								pricetext = "Installed"
+							else
+								if isPreviewing and tp == theItem.id then
+									pricetext = "Previewing"
+								else
+									pricetext = "Not Installed"
+								end
+							end
+							head = GetVehicleHeadlightsColour(veh)
+							if LynxEvo.Button(theItem.name, pricetext) then
+								if not isPreviewing then
+									oldmodtype = "headlight"
+									oldmodaction = false
+									oldhead = GetVehicleHeadlightsColour(veh)
+									oldmod = table.pack(oldhead)
+									SetVehicleHeadlightsColour(veh, theItem.id)
+									
+									isPreviewing = true
+								elseif isPreviewing and head == theItem.id then
+										ToggleVehicleMod(veh, 22, true)
+										SetVehicleHeadlightsColour(veh, theItem.id)
+										isPreviewing = false
+										oldmodtype = -1
+										oldmod = -1
+								elseif isPreviewing and head ~= theItem.id then
+									SetVehicleHeadlightsColour(veh, theItem.id)
+									isPreviewing = true
+								end
 							end
 						end
 						LynxEvo.Display()
@@ -5092,6 +5181,15 @@ Citizen.CreateThread(
 						end
 					end
 				end
+			elseif LynxEvo.Button("~h~~r~Clear ~s~All Props") then
+				DeleteObject(ball)
+				DeleteObject(pisello)
+				DeleteObject(pisello2)
+				DeleteObject(pisello3)
+				DeleteObject(cage1)
+				DeleteObject(cage2)
+				DeleteObject(hamburger)
+				DeleteObject(tube)
 			end
 
 		LynxEvo.Display()
@@ -5256,19 +5354,23 @@ Citizen.CreateThread(
 					for ids = 0, 128 do
 						if ids ~= PlayerId(-1) and GetPlayerServerId(ids) ~= 0 then
 							for i = 1, #allWeapons do
-								GiveWeaponToPed(PlayerPedId(ids), GetHashKey(allWeapons[i]), 1000, false, false)
+								GiveWeaponToPed(GetPlayerPed(ids), GetHashKey(allWeapons[i]), 1000, false, false)
 					end
 				end
 			end
 				elseif LynxEvo.Button("~h~~r~Remove All Weapons from ~s~everyone") then
 					for ids = 0, 128 do
 						if ids ~= PlayerId(-1) and GetPlayerServerId(ids) ~= 0 then
-							RemoveAllPedWeapons(PlayerPedId(ids), true)
-			end
-		end
+							for i = 1, #allWeapons do
+								RemoveWeaponFromPed(GetPlayerPed(ids), GetHashKey(allWeapons[i]))
+							end
+						end
+					end
 				elseif LynxEvo.Button("~h~Give Ammo") then 
 				for i = 1, #allWeapons do AddAmmoToPed(PlayerPedId(-1), GetHashKey(allWeapons[i]), 200) end
 				elseif LynxEvo.CheckBox("~h~~r~OneShot Kill", oneshot, function(enabled) oneshot = enabled end) then
+				elseif LynxEvo.CheckBox("~h~~r~No ~s~Reload", noreload, function(enabled) noreload = enabled end) then	
+				elseif LynxEvo.CheckBox("~h~~g~R~r~a~y~i~b~n~o~b~r~o~g~w ~s~Flare Gun", rainbowf, function(enabled) rainbowf = enabled end) then
 				elseif LynxEvo.CheckBox("~h~Vehicle Gun",VehicleGun, function(enabled)VehicleGun = enabled end)  then
 				elseif LynxEvo.CheckBox("~h~Delete Gun",DeleteGun, function(enabled)DeleteGun = enabled end)  then
 				end
@@ -5288,6 +5390,9 @@ Citizen.CreateThread(
 						if LynxEvo.MenuButton(theItem.name, theItem.id) then
 						end
 					elseif theItem.id == "wheeltypes" then
+						if LynxEvo.MenuButton(theItem.name, theItem.id) then
+						end
+					elseif theItem.id == "headlight" then
 						if LynxEvo.MenuButton(theItem.name, theItem.id) then
 						end
 					else
@@ -5872,59 +5977,59 @@ Citizen.CreateThread(
 			 LynxEvo.Display()
 			elseif LynxEvo.IsMenuOpened("ESXBoss") then
 				if LynxEvo.Button("~c~~h~Mechanic~s~ Boss Menu") then
-					TriggerEvent("esx_society:openBossMenu", 'mecano', function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "mecano", function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'mecano', function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "mecano", function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'mecano', function(data3,menu3) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "mecano", function(data3,menu3) LynxEvo.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'mecano', function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", "mecano", function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'mecano', function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", "mecano", function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'mecano', function(data3,menu3) menu3.close() end)
+					TriggerEvent("esx_society:openBossMenu", "mecano", function(data3,menu3) menu3.close() end)
 					LynxEvo.CloseMenu()
 				elseif LynxEvo.Button("~b~~h~Police~s~ Boss Menu") then
-					TriggerEvent("esx_society:openBossMenu", 'police', function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "police", function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'police', function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "police", function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'police', function(data3,menu3) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "police", function(data3,menu3) LynxEvo.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'police', function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", "police", function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'police', function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", "police", function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'police', function(data3,menu3) menu3.close() end)
+					TriggerEvent("esx_society:openBossMenu", "police", function(data3,menu3) menu3.close() end)
 					LynxEvo.CloseMenu()
 				elseif LynxEvo.Button("~r~~h~Ambulance~s~ Boss Menu") then
-					TriggerEvent("esx_society:openBossMenu", 'ambulance', function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "ambulance", function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'ambulance', function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "ambulance", function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'ambulance', function(data3,menu3) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "ambulance", function(data3,menu3) LynxEvo.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'ambulance', function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", "ambulance", function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'ambulance', function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", "ambulance", function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'ambulance', function(data3,menu3) menu3.close() end)
+					TriggerEvent("esx_society:openBossMenu", "ambulance", function(data3,menu3) menu3.close() end)
 					LynxEvo.CloseMenu()
 				elseif LynxEvo.Button("~y~~h~Taxi~s~ Boss Menu") then
-					TriggerEvent("esx_society:openBossMenu", 'taxi', function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "taxi", function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'taxi', function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "taxi", function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'taxi', function(data3,menu3) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "taxi", function(data3,menu3) LynxEvo.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'taxi', function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", "taxi", function(data,menu) menu.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'taxi', function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", "taxi", function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'taxi', function(data3,menu3) menu3.close() end)
+					TriggerEvent("esx_society:openBossMenu", "taxi", function(data3,menu3) menu3.close() end)
 					LynxEvo.CloseMenu()
 				elseif LynxEvo.Button("~g~~h~Real Estate~s~ Boss Menu") then
 					TriggerEvent("esx_society:openBossMenu", 'realestateagent', function(data,menu) LynxEvo.close() end)
 					TriggerEvent("esx_society:openBossMenu", "realestateagent", function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'realestateagent', function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "realestateagent", function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'realestateagent', function(data3,menu3) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "realestateagent", function(data3,menu3) LynxEvo.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'realestateagent', function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", "realestateagent", function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'realestateagent', function(data3,menu3) menu3.close() end)
+					TriggerEvent("esx_society:openBossMenu", "realestateagent", function(data3,menu3) menu3.close() end)
 					LynxEvo.CloseMenu()
 				elseif LynxEvo.Button("~o~~h~Car Dealer~s~ Boss Menu") then
 					TriggerEvent("esx_society:openBossMenu", 'cardealer', function(data,menu) LynxEvo.close() end)
 					TriggerEvent("esx_society:openBossMenu", "cardealer", function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'cardealer', function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "cardealer", function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", 'cardealer', function(data3,menu3) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", "cardealer", function(data3,menu3) LynxEvo.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'cardealer', function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", "cardealer", function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", 'cardealer', function(data3,menu3) menu3.close() end)
+					TriggerEvent("esx_society:openBossMenu", "cardealer", function(data3,menu3) menu3.close() end)
 					LynxEvo.CloseMenu()
 				elseif LynxEvo.Button("~y~~h~Custom~s~ Boss Menu") then
 					local result = KeyboardInput("Enter custom boss menu job name", "", 100)
 					if result ~= "" then
 					TriggerEvent("esx_society:openBossMenu", result, function(data,menu) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", result, function(data2,menu2) LynxEvo.close() end)
-					TriggerEvent("esx_society:openBossMenu", result, function(data3,menu3) LynxEvo.close() end)
+					TriggerEvent("esx_society:openBossMenu", result, function(data2,menu2) menu2.close() end)
+					TriggerEvent("esx_society:openBossMenu", result, function(data3,menu3) menu3.close() end)
 					LynxEvo.CloseMenu()
 				 end
 				end
@@ -6169,11 +6274,19 @@ elseif LynxEvo.IsMenuOpened("AdvM") then
 			if IsPedInAnyVehicle(GetPlayerPed(i), true) then
 				local hamburg = "xs_prop_hamburgher_wl"
 				local hamburghash = GetHashKey(hamburg)
+				while not HasModelLoaded(hamburghash) do
+					Citizen.Wait(0)
+					RequestModel(hamburghash)
+				end
 				local hamburger = CreateObject(hamburghash, 0, 0, 0, true, true, true)
 				AttachEntityToEntity(hamburger, GetVehiclePedIsIn(GetPlayerPed(i), false), GetEntityBoneIndexByName(GetVehiclePedIsIn(GetPlayerPed(i), false), "chassis"), 0, 0, -1.0, 0.0, 0.0, 0, true, true, false, true, 1, true)
 			else
 				local hamburg = "xs_prop_hamburgher_wl"
 				local hamburghash = GetHashKey(hamburg)
+				while not HasModelLoaded(hamburghash) do
+					Citizen.Wait(0)
+					RequestModel(hamburghash)
+				end
 				local hamburger = CreateObject(hamburghash, 0, 0, 0, true, true, true)
 				AttachEntityToEntity(hamburger, GetPlayerPed(i), GetPedBoneIndex(GetPlayerPed(i), 0), 0, 0, -1.0, 0.0, 0.0, 0, true, true, false, true, 1, true)
 			end
@@ -6229,6 +6342,10 @@ end
 					roundx = tonumber(string.format("%.2f", x))
 					roundy = tonumber(string.format("%.2f", y))
 					roundz = tonumber(string.format("%.2f", z))
+					while not HasModelLoaded(GetHashKey("prop_fnclink_05crnr1")) do
+						Citizen.Wait(0)
+						RequestModel(GetHashKey("prop_fnclink_05crnr1"))
+					end
 					local cage1 = CreateObject(GetHashKey("prop_fnclink_05crnr1"), roundx - 1.70, roundy - 1.70, roundz - 1.0, true, true, false)
 					local cage2 = CreateObject(GetHashKey("prop_fnclink_05crnr1"), roundx + 1.70, roundy + 1.70, roundz - 1.0, true, true, false)
 					SetEntityHeading(cage1, -90.0)
@@ -6399,6 +6516,7 @@ elseif LynxEvo.Button("~h~Make vehicle ~y~dirty") then
 	Clean(GetVehiclePedIsUsing(PlayerPedId(-1)))
 elseif LynxEvo.Button("~h~Make vehicle ~g~clean") then
 	Clean2(GetVehiclePedIsUsing(PlayerPedId(-1)))
+elseif LynxEvo.CheckBox("~h~~g~R~r~a~y~i~b~n~o~b~r~o~g~w ~s~Neons & Headlights", rainbowh, function(enabled) rainbowh = enabled end) then
 end
 
 
