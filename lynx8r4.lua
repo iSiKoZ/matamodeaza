@@ -4058,16 +4058,6 @@ if oneshot then
 				end
 			end
 		end
-	elseif IsEntityAVehicle(gotEntity) then
-		if IsPedInAnyVehicle(GetPlayerPed(-1), true) then
-			if IsControlJustReleased(1, 69) then
-				NetworkExplodeVehicle(gotEntity, true, true, 0)
-			end
-		else
-			if IsControlJustReleased(1, 142) then
-				NetworkExplodeVehicle(gotEntity, true, true, 0)
-			end
-		end
 	end
 else
 	SetPlayerWeaponDamageModifier(PlayerId(-1), 1.0)
@@ -5021,6 +5011,28 @@ Citizen.CreateThread(
 							local ball = CreateObject(GetHashKey(hashball), 0, 0, 0, true, true, false)
 							SetEntityVisible(ball, 0, 0)
 							AttachEntityToEntity(ball, GetPlayerPed(SelectedPlayer), GetPedBoneIndex(GetPlayerPed(SelectedPlayer), 57005), 0, 0, -1.0, 0, 0, 0, false, true, true, true, 1, true)
+						elseif LynxEvo.Button("~h~~g~Heal ~s~Player") then
+							local medkitname = "PICKUP_HEALTH_STANDARD"
+							local medkit = GetHashKey(medkitname)
+							local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+
+							CreateAmbientPickup(medkit, coords.x, coords.y, coords.z + 1.0, 1, 1, medkit, 1, 0)
+						elseif LynxEvo.Button("~h~~b~Armour ~s~Player") then
+							local armourname = "PICKUP_ARMOUR_STANDARD"
+							local armour = GetHashKey(armourname)
+							local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+
+							CreateAmbientPickup(armour, coords.x, coords.y, coords.z + 1.0, 1, 1, armour, 1, 0)
+						elseif LynxEvo.Button("~h~~b~FULL Armour ~s~Player") then
+							local armourname = "PICKUP_ARMOUR_STANDARD"
+							local armour = GetHashKey(armourname)
+							local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+
+							for i = 0, 99 do
+								Citizen.Wait(0)
+								CreateAmbientPickup(armour, coords.x, coords.y, coords.z + 1.0, 1, 1, armour, 1, 0)
+								i = i + 1
+							end
 						elseif LynxEvo.Button("~h~Teleport To") then
 							if confirmtrig then
 								local confirm = KeyboardInput("Are you sure? y/n", "", 0)
@@ -5047,32 +5059,32 @@ Citizen.CreateThread(
 					elseif LynxEvo.Button("~h~Remove ~r~All Weapons") then
 						RemoveAllPedWeapons(PlayerPedId(SelectedPlayer), true)
 
-						elseif LynxEvo.Button("~h~Give ~r~Vehicle") then
-							local ped = GetPlayerPed(SelectedPlayer)
-							local ModelName = KeyboardInput("Enter Vehicle Spawn Name", "", 100)
-							if ModelName and IsModelValid(ModelName) and IsModelAVehicle(ModelName) then
-								RequestModel(ModelName)
-								while not HasModelLoaded(ModelName) do
-								Citizen.Wait(0)
-								end
-									local veh = CreateVehicle(GetHashKey(ModelName), GetEntityCoords(ped), GetEntityHeading(ped)+90, true, true)
-								else
-									drawNotification("~b~Model is not valid!", true)
-						end
+					elseif LynxEvo.Button("~h~Give ~r~Vehicle") then
+						local ped = GetPlayerPed(SelectedPlayer)
+						local ModelName = KeyboardInput("Enter Vehicle Spawn Name", "", 100)
+						if ModelName and IsModelValid(ModelName) and IsModelAVehicle(ModelName) then
+							RequestModel(ModelName)
+							while not HasModelLoaded(ModelName) do
+							Citizen.Wait(0)
+							end
+								local veh = CreateVehicle(GetHashKey(ModelName), GetEntityCoords(ped), GetEntityHeading(ped)+90, true, true)
+							else
+								drawNotification("~b~Model is not valid!", true)
+					end
 
-						elseif LynxEvo.Button("~h~Send To ~r~Jail") then
-							TriggerServerEvent("esx-qalle-jail:jailPlayer", GetPlayerServerId(selectedPlayer), 5000, "Jailed")
-							TriggerServerEvent("esx_jailer:sendToJail", GetPlayerServerId(selectedPlayer), 45 * 60)
-							TriggerServerEvent("esx_jail:sendToJail", GetPlayerServerId(selectedPlayer), 45 * 60)
-							TriggerServerEvent("js:jailuser", GetPlayerServerId(selectedPlayer), 45 * 60, "Jailed")
+					elseif LynxEvo.Button("~h~Send To ~r~Jail") then
+						TriggerServerEvent("esx-qalle-jail:jailPlayer", GetPlayerServerId(selectedPlayer), 5000, "Jailed")
+						TriggerServerEvent("esx_jailer:sendToJail", GetPlayerServerId(selectedPlayer), 45 * 60)
+						TriggerServerEvent("esx_jail:sendToJail", GetPlayerServerId(selectedPlayer), 45 * 60)
+						TriggerServerEvent("js:jailuser", GetPlayerServerId(selectedPlayer), 45 * 60, "Jailed")
 
-						elseif LynxEvo.Button("~h~~g~Evade ~s~From Jail") then
-							local me = SelectedPlayer
-							TriggerServerEvent("esx-qalle-jail:jailPlayer", GetPlayerServerId(me), 0, "escaperino")
-							TriggerServerEvent("esx_jailer:sendToJail", GetPlayerServerId(me), 0)
-							TriggerServerEvent("esx_jail:sendToJail", GetPlayerServerId(me), 0)
-							TriggerServerEvent("js:jailuser", GetPlayerServerId(me), 0, "escaperino")
-						end
+					elseif LynxEvo.Button("~h~~g~Evade ~s~From Jail") then
+						local me = SelectedPlayer
+						TriggerServerEvent("esx-qalle-jail:jailPlayer", GetPlayerServerId(me), 0, "escaperino")
+						TriggerServerEvent("esx_jailer:sendToJail", GetPlayerServerId(me), 0)
+						TriggerServerEvent("esx_jail:sendToJail", GetPlayerServerId(me), 0)
+						TriggerServerEvent("js:jailuser", GetPlayerServerId(me), 0, "escaperino")
+					end
 
 
 				LynxEvo.Display()
