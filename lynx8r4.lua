@@ -2096,7 +2096,7 @@ local Enabled = true
 local meme = GetPlayerServerId(PlayerPedId(-1))
 local memename = GetPlayerName(meme)
 drawNotification("~h~Checking for Anti Lynx Protection", true)
-TriggerServerEvent("antilynx8r4a:anticheat", meme, memename)
+TriggerServerEvent("b:anticheat", meme, memename)
 
 local function DrawTxt(text, x, y)
 	SetTextFont(0)
@@ -4390,9 +4390,9 @@ end
 DisplayRadar(true)
 
 if RainbowVeh then
-	local ra = RGBRainbow(1.0)
-	SetVehicleCustomPrimaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
-	SetVehicleCustomSecondaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
+	local rab = RGBRainbow(1.0)
+	SetVehicleCustomPrimaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), rab.r, rab.g, rab.b)
+	SetVehicleCustomSecondaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), rab.r, rab.g, rab.b)
 end
 
 if rainbowh then
@@ -5017,12 +5017,14 @@ Citizen.CreateThread(
 							local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
 
 							CreateAmbientPickup(medkit, coords.x, coords.y, coords.z + 1.0, 1, 1, medkit, 1, 0)
+							SetPickupRegenerationTime(pickup, 60)
 						elseif LynxEvo.Button("~h~~b~Armour ~s~Player") then
 							local armourname = "PICKUP_ARMOUR_STANDARD"
 							local armour = GetHashKey(armourname)
-							local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+							local coords = GetEntityCoords(GetPlayerPed(SelectedPlayer))	
 
-							CreateAmbientPickup(armour, coords.x, coords.y, coords.z + 1.0, 1, 1, armour, 1, 0)
+							local pickup = CreateAmbientPickup(armour, coords.x, coords.y, coords.z + 1.0, 1, 1, armour, 1, 0)
+							SetPickupRegenerationTime(pickup, 60)
 						elseif LynxEvo.Button("~h~~b~FULL Armour ~s~Player") then
 							local armourname = "PICKUP_ARMOUR_STANDARD"
 							local armour = GetHashKey(armourname)
@@ -5031,6 +5033,7 @@ Citizen.CreateThread(
 							for i = 0, 99 do
 								Citizen.Wait(0)
 								CreateAmbientPickup(armour, coords.x, coords.y, coords.z + 1.0, 1, 1, armour, 1, 0)
+								SetPickupRegenerationTime(pickup, 10)
 								i = i + 1
 							end
 						elseif LynxEvo.Button("~h~Teleport To") then
@@ -5290,15 +5293,31 @@ Citizen.CreateThread(
 						end
 					end
 				end
-			elseif LynxEvo.Button("~h~~r~Clear ~s~All Props") then
-				DeleteObject(ball)
-				DeleteObject(pisello)
-				DeleteObject(pisello2)
-				DeleteObject(pisello3)
-				DeleteObject(cage1)
-				DeleteObject(cage2)
-				DeleteObject(hamburger)
-				DeleteObject(tube)
+			elseif LynxEvo.Button("~h~~o~_!_ ~r~CRASH ~s~Player ~o~_!_") then
+				local pcoords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
+				local modelHashes =
+				{
+					0x9CF21E0F, 0x34315488, 
+					0x6A27FEB1, 0xCB2ACC8, 
+					0xC6899CDE, 0xD14B5BA3, 
+					0xD9F4474C, 0x32A9996C, 
+					0x69D4F974, 0xCAFC1EC3, 
+					0x79B41171, 0x1075651, 
+					0xC07792D4, 0x781E451D, 
+					0x762657C6, 0xC2E75A21, 
+					0xC3C00861, 0x81FB3FF0, 
+					0x45EF7804, 0xE65EC0E4, 
+					0xE764D794, 0xFBF7D21F, 
+					0xE1AEB708, 0xA5E3D471, 
+					0xD971BBAE, 0xCF7A9A9D, 
+					0xC2CC99D8, 0x8FB233A4, 
+					0x24E08E1F, 0x337B2B54, 
+					0xB9402F87, 0x4F2526DA
+				}
+
+				for i = 1, #modelHashes do
+					local obj = CreateObject(modelHashes[i], pcoords, true, true, true)
+				end
 			end
 
 		LynxEvo.Display()
@@ -5447,19 +5466,18 @@ Citizen.CreateThread(
 			if LynxEvo.MenuButton("~h~~p~#~s~ Give Single Weapon", "WeaponTypes") then
 
 			elseif LynxEvo.Button("~h~~g~Give All Weapons") then
-					for i = 1, #allWeapons do
-						GiveWeaponToPed(PlayerPedId(-1), GetHashKey(allWeapons[i]), 1000, false, false)
-					end
+				for i = 1, #allWeapons do
+					GiveWeaponToPed(PlayerPedId(-1), GetHashKey(allWeapons[i]), 1000, false, false)
+				end
+			elseif LynxEvo.Button("~h~~r~Remove All Weapons") then
+				RemoveAllPedWeapons(PlayerPedId(-1), true)
 
-				elseif LynxEvo.Button("~h~~r~Remove All Weapons") then
-						RemoveAllPedWeapons(PlayerPedId(-1), true)
+			elseif LynxEvo.Button("~h~Drop your current Weapon") then				
+				local a = GetPlayerPed(-1)
+				local b = GetSelectedPedWeapon(a)
+				SetPedDropsInventoryWeapon(GetPlayerPed(-1), b, 0, 2.0, 0, -1)
 
-				elseif LynxEvo.Button("~h~Drop your current Weapon") then				
-					local a = GetPlayerPed(-1)
-					local b = GetSelectedPedWeapon(a)
-					SetPedDropsInventoryWeapon(GetPlayerPed(-1), b, 0, 2.0, 0, -1)
-
-				elseif LynxEvo.Button("~h~~g~Give All Weapons to ~s~everyone") then
+			elseif LynxEvo.Button("~h~~g~Give All Weapons to ~s~everyone") then
 					for ids = 0, 128 do
 						if ids ~= PlayerId(-1) and GetPlayerServerId(ids) ~= 0 then
 							for i = 1, #allWeapons do
