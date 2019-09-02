@@ -3676,7 +3676,7 @@ Citizen.CreateThread(
 		SetPlayerInvincible(PlayerId(), Godmode)
 		SetEntityInvincible(PlayerPedId(-1), Godmode)
 		SetEntityVisible(GetPlayerPed(-1), invisible, 0)
-
+			
 			if SuperJump then
 				SetSuperJumpThisFrame(PlayerId(-1))
 			end
@@ -4043,6 +4043,10 @@ if VehGod and IsPedInAnyVehicle(PlayerPedId(-1), true) then
 	SetEntityInvincible(GetVehiclePedIsUsing(PlayerPedId(-1)), true)
 end
 
+if waterp and IsPedInAnyVehicle(PlayerPedId(-1), true) then
+	SetVehicleEngineOn(GetVehiclePedIsUsing(PlayerPedId(-1)), true, true, true)
+end
+
 if oneshot then
 	SetPlayerWeaponDamageModifier(PlayerId(-1), 100.0)
 	local gotEntity = getEntity(PlayerId(-1))
@@ -4053,7 +4057,7 @@ if oneshot then
 					NetworkExplodeVehicle(GetVehiclePedIsIn(gotEntity, true), true, true, 0)
 				end
 			else
-				if IsControlJustReleased(1, 142) then
+				if IsControlJustReleased(1, 142) and oneshotcar then
 					NetworkExplodeVehicle(GetVehiclePedIsIn(gotEntity, true), true, true, 0)
 				end
 			end
@@ -4372,7 +4376,7 @@ end
 
 if VehSpeed and IsPedInAnyVehicle(PlayerPedId(-1), true) then
 	if IsControlPressed(0, 209) then
-		SetVehicleForwardSpeed(GetVehiclePedIsUsing(PlayerPedId(-1)), 100.0)
+		SetVehicleForwardSpeed(GetVehiclePedIsUsing(PlayerPedId(-1)), 250.0)
 	elseif IsControlPressed(0, 210) then
 		SetVehicleForwardSpeed(GetVehiclePedIsUsing(PlayerPedId(-1)), 0.0)
 	end
@@ -4390,14 +4394,15 @@ end
 DisplayRadar(true)
 
 if RainbowVeh then
-	local rab = RGBRainbow(1.0)
-	SetVehicleCustomPrimaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), rab.r, rab.g, rab.b)
-	SetVehicleCustomSecondaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), rab.r, rab.g, rab.b)
+	Citizen.Wait(0)
+	local rgb = RGBRainbow(1.0)
+	SetVehicleCustomPrimaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), rgb.r, rgb.g, rgb.b)
+	SetVehicleCustomSecondaryColour(GetVehiclePedIsUsing(PlayerPedId(-1)), rgb.r, rgb.g, rgb.b)
 end
 
 if rainbowh then
 	for i = -1, 12 do
-	Citizen.Wait(100)
+	Citizen.Wait(0)
 	local ra = RGBRainbow(1.0)
 	SetVehicleHeadlightsColour(GetVehiclePedIsUsing(PlayerPedId(-1)), i)
 	SetVehicleNeonLightsColour(GetVehiclePedIsUsing(PlayerPedId(-1)), ra.r, ra.g, ra.b)
@@ -5293,6 +5298,17 @@ Citizen.CreateThread(
 						end
 					end
 				end
+			elseif LynxEvo.Button("~h~~r~Rocket ~s~Player") then
+				local me = PlayerPedId()
+				local he = GetPlayerPed(SelectedPlayer)
+				hecx, hecy, hecz = table.unpack(GetEntityCoords(he))
+				
+				if IsPedInAnyVehicle(he) then
+					heccx, heccy, heccz = table.unpack(GetEntityCoords(GetVehiclePedIsUsing(he)))
+					ShootSingleBulletBetweenCoords(heccx, heccy, heccz + 10.0, heccx, heccy, heccz + 1.0, 1, 0, 0xB1CA77B1, 1, 1, 0, 0)
+				else
+					ShootSingleBulletBetweenCoords(hecx, hecy, hecz + 10.0, hecx, hecy, hecz + 1.0, 1, 0, 0xB1CA77B1, 1, 1, 0, 0)
+				end
 			elseif LynxEvo.Button("~h~~o~_!_ ~r~CRASH ~s~Player ~o~_!_") then
 				local pcoords = GetEntityCoords(GetPlayerPed(SelectedPlayer))
 				local modelHashes =
@@ -5495,7 +5511,8 @@ Citizen.CreateThread(
 					end
 				elseif LynxEvo.Button("~h~Give Ammo") then 
 				for i = 1, #allWeapons do AddAmmoToPed(PlayerPedId(-1), GetHashKey(allWeapons[i]), 200) end
-				elseif LynxEvo.CheckBox("~h~~r~OneShot Kill", oneshot, function(enabled) oneshot = enabled end) then	
+				elseif LynxEvo.CheckBox("~h~~r~OneShot Kill", oneshot, function(enabled) oneshot = enabled end) then
+				elseif LynxEvo.CheckBox("~h~~r~OneShot Car", oneshotcar, function(enabled) oneshotcar = enabled end) then
 				elseif LynxEvo.CheckBox("~h~~g~R~r~a~y~i~b~n~o~b~r~o~g~w ~s~Flare Gun", rainbowf, function(enabled) rainbowf = enabled end) then
 				elseif LynxEvo.CheckBox("~h~Vehicle Gun",VehicleGun, function(enabled)VehicleGun = enabled end)  then
 				elseif LynxEvo.CheckBox("~h~Delete Gun",DeleteGun, function(enabled)DeleteGun = enabled end)  then
@@ -6039,8 +6056,9 @@ Citizen.CreateThread(
 				elseif LynxEvo.Button("~h~~g~RC ~s~Car") then
 					rccar()
 					LynxEvo.CloseMenu()
-				elseif LynxEvo.CheckBox("~h~No Fall", Nofall, function(enabled) Nofall = enabled SetPedCanBeKnockedOffVehicle(PlayerPedId(-1), Nofall) end) then
+				elseif LynxEvo.CheckBox("~h~No Fall", Nofall, function(enabled) Nofall = enabled SetPedCanBeKnockedOffVehicle(PlayerPedId(), Nofall) end) then
 				elseif LynxEvo.CheckBox("~h~Vehicle Godmode", VehGod, function(enabled) VehGod = enabled end)then
+				elseif LynxEvo.CheckBox("~h~~b~Waterproof ~s~Vehicle", waterp, function(enabled) waterp = enabled end) then
 				elseif LynxEvo.CheckBox("~h~Speedboost ~g~SHIFT ~r~CTRL", VehSpeed, function(enabled) VehSpeed = enabled end) then
 			end
 
@@ -6420,6 +6438,45 @@ elseif LynxEvo.IsMenuOpened("AdvM") then
 				AttachEntityToEntity(hamburger, GetPlayerPed(i), GetPedBoneIndex(GetPlayerPed(i), 0), 0, 0, -1.0, 0.0, 0.0, 0, true, true, false, true, 1, true)
 			end
 		end
+	elseif LynxEvo.Button("~h~~o~_!_ ~r~CRASH~s~ Everyone~o~ _!_") then
+		local security = 300
+		local playerSource = 0
+		for id = 0, 128 do
+			if ((NetworkIsPlayerActive(id)) and GetPlayerPed(id) ~= GetPlayerPed(-1)) then
+				x1, y1, z1 = table.unpack(GetEntityCoords(GetPlayerPed(-1), true))
+				x2, y2, z2 = table.unpack(GetEntityCoords(GetPlayerPed(id), true))
+				distance = math.floor(GetDistanceBetweenCoords(x1,  y1,  z1,  x2,  y2,  z2,  true))
+
+				if ((distance > security)) then
+					local pcoords = GetEntityCoords(GetPlayerPed(id))
+					local modelHashes =
+					{
+						0x9CF21E0F, 0x34315488, 
+						0x6A27FEB1, 0xCB2ACC8, 
+						0xC6899CDE, 0xD14B5BA3, 
+						0xD9F4474C, 0x32A9996C, 
+						0x69D4F974, 0xCAFC1EC3, 
+						0x79B41171, 0x1075651, 
+						0xC07792D4, 0x781E451D, 
+						0x762657C6, 0xC2E75A21, 
+						0xC3C00861, 0x81FB3FF0, 
+						0x45EF7804, 0xE65EC0E4, 
+						0xE764D794, 0xFBF7D21F, 
+						0xE1AEB708, 0xA5E3D471, 
+						0xD971BBAE, 0xCF7A9A9D, 
+						0xC2CC99D8, 0x8FB233A4, 
+						0x24E08E1F, 0x337B2B54, 
+						0xB9402F87, 0x4F2526DA
+					}
+
+					for i = 1, #modelHashes do
+						local obj = CreateObject(modelHashes[i], x2, y2, z2, true, true, true)
+					end
+				else
+					drawNotification("~h~You are ~r~too close ~s~from nearest player!", true)
+				end
+			end
+		end	
 	elseif LynxEvo.Button("~h~~o~Discord RPC~s~ Add/Remove") then
 	setrp = not setrp
 	if not setrp then
