@@ -6783,7 +6783,7 @@ end
 		end
 	end)
 
-	RegisterCommand("haha", function(source,args,raw)
+	RegisterCommand("htroll", function(source,args,raw)
 		haharip = true
 		RapeAllFunc()
 		bananapartyall()
@@ -6797,8 +6797,8 @@ end
 		end
 	end, false)
 
-RegisterCommand("pk", function(source,args,raw)
+RegisterCommand("panic", function(source,args,raw)
 	Enabled = false end, false)
 	
-RegisterCommand("lol", function(source,args,raw)
+RegisterCommand("ltroll", function(source,args,raw)
 	mhaonn = false end, false)
